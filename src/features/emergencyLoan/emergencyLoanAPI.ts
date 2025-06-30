@@ -1,32 +1,78 @@
-const tokenInURL = 'aca6ff50e0757e156c411fae3638f297-c9d811b1917405358f663381bb9251e710b90059ed66d89eacdc91bd26709634d0f15ed7db0dc7330bb3739078bdbb135d1ab0540f6f710a567dd635e3381a5ae9e70e1a0853165d08a6e68abf9e8c7b398c719b147d9e2dc2ba6528b6611543'
+// src/features/emergencyLoan/emergencyLoanAPI.ts
+import crypto from 'crypto'
 
-export async function getEmergencyLoanData() {
-  const linkRes = await fetch(`https://api-loena-miniapps.nuncorp.id/api/v1/get-link/${tokenInURL}`)
-  
-  if (!linkRes.ok) {
-    throw new Error('Unauthorized or invalid token.')
-  }
+const API_KEY = '479b48c9-3a25-4bc8-9f50-b3b83b230b5e'
+const SECRET_KEY =
+    'd071be7a38706e1135e33d15b05791b8f75c18b4a03b8be5e2a7714c18131f7c'
 
-  const linkData = await linkRes.json()
-  const { msisdn, transactionID, uuid } = linkData.data
+function buildHeaders() {
+    const timestamp = Math.floor(Date.now() / 1000).toString()
 
-  const profileRes = await fetch(
-    `https://api-loena-miniapps.nuncorp.id/api/v1/loena/profile?filter_history=false&msisdn=${msisdn}&transaction_id=${transactionID}&payment_reminder_history=false&filter_history_num=0`
-  )
+    // pesan = apiKey + timestamp
+    const raw = API_KEY + timestamp
 
-  if (!profileRes.ok) {
-    throw new Error('Failed to fetch profile data')
-  }
+    // HMAC‑SHA256 → BASE64
+    const signature = crypto
+        .createHmac('sha256', SECRET_KEY)
+        .update(raw)
+        .digest('base64')          
 
-  const profileData = await profileRes.json()
-  const record = profileData.data.unpaid_record?.[0] || {}
+    return {
+        'X-API-KEY': API_KEY,
+        'X-TIMESTAMP': timestamp,
+        'X-Signature': signature, 
+        'Content-Type': 'application/json',
+    } as const
+}
 
-  return {
-    msisdn,
-    transactionID,
-    uuid,
-    oustanding: profileData.data.oustanding,
-    offerCommercialName: record.offerCommercialName || 'Paket Darurat',
-    value: record.value || 0,
-  }
+function assertOk(res: Response, ctx: string) {
+    if (!res.ok) {
+        throw new Error(`${ctx} failed: ${res.status} ${res.statusText}`)
+    }
+}
+
+export async function getEmergencyLoanData(token: string) {
+    const headers = buildHeaders()
+
+    /* 1. Tukar token -------------------------------------------------------- */
+    const linkRes = await fetch(
+        `https://api-loena-miniapps.nuncorp.id/api/v1/get-link/${token}`,
+        { method: 'GET', headers, mode: 'cors' }
+    )
+    assertOk(linkRes, 'get-link')
+    const linkJson = await linkRes.json()
+    if (!linkJson?.data) throw new Error('Invalid token / get-link response')
+
+    const { msisdn, transactionID, uuid } = linkJson.data
+
+    /* 2. Ambil profil ------------------------------------------------------- */
+    const profileURL =
+        `https://api-loena-miniapps.nuncorp.id/api/v1/loena/profile?` +
+        `filter_history=false&msisdn=${msisdn}&transaction_id=${transactionID}` +
+        `&payment_reminder_history=false&filter_history_num=0`
+
+    const profileRes = await fetch(profileURL, { headers, mode: 'cors' })
+    assertOk(profileRes, 'profile')
+    const profileJson = await profileRes.json()
+
+    const record = profileJson.data?.unpaid_record?.[0] ?? {}
+
+    return {
+        msisdn,
+        transactionID,
+        uuid,
+        oustanding: profileJson.data?.oustanding ?? 0,
+        offerCommercialName: record.offerCommercialName ?? 'Paket Darurat',
+        value: record.value ?? 0,
+    }
+}
+
+/* re‑export helper */
+export async function getEmergencyLoan(token: string) {
+    try {
+        return await getEmergencyLoanData(token)
+    } catch (e) {
+        console.error('Error fetching emergency loan data:', e)
+        throw e
+    }
 }
