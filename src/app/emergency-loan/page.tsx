@@ -2,7 +2,7 @@
 import { Suspense } from 'react'
 import EmergencyLoanPage from '@/components/pages/EmergencyLoanPage'
 
-export const dynamic = 'force-dynamic' // opsional, kalau kamu ingin bypass SSG
+export const dynamic = 'force-dynamic' 
 
 export default function Page() {
   return (
