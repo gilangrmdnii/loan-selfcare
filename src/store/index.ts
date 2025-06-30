@@ -1,18 +1,15 @@
 // src/store/index.ts
+
 import { configureStore } from '@reduxjs/toolkit'
-import { createWrapper } from 'next-redux-wrapper'
-import dummyReducer from './slices/dummySlice'
+import emergencyLoanReducer from '@/features/emergencyLoan/emergencyLoanSlice'
 
 export const makeStore = () =>
   configureStore({
     reducer: {
-      dummy: dummyReducer,
+      emergencyLoan: emergencyLoanReducer,
     },
-    devTools: process.env.NODE_ENV !== 'production',
   })
 
 export type AppStore = ReturnType<typeof makeStore>
-export type AppState = ReturnType<AppStore['getState']>
+export type RootState = ReturnType<AppStore['getState']>
 export type AppDispatch = AppStore['dispatch']
-
-export const wrapper = createWrapper<AppStore>(makeStore)
