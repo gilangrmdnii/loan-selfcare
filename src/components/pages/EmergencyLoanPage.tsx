@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAppDispatch } from '@/store/hooks'
-import { fetchEmergencyLoanFromLocal } from '@/features/emergencyLoan/emergencyLoanSlice'
+import { fetchEmergencyLoan } from '@/features/emergencyLoan/emergencyLoanSlice'
 
 // Komponen UI
 import Header from '@/components/Header'
@@ -16,8 +16,9 @@ import EmergencyBalance from '@/components/EmergencyBalance'
 import TermsModal from '@/components/TermsModal'
 import ConfirmModal from '@/components/ConfirmModal'
 import ProductModal from '@/components/ProductModal'
-
 import { Product } from '@/types/ProductType'
+import { useSelector, TypedUseSelectorHook } from 'react-redux'
+import { RootState } from '@/store'
 
 export default function EmergencyLoanPage() {
   const dispatch = useAppDispatch()
@@ -29,10 +30,12 @@ export default function EmergencyLoanPage() {
   const [activeTab, setActiveTab] = useState<'paket' | 'saldo'>('paket')
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const { eligible, hasPaid } = useAppSelector((state) => state.emergencyLoan)
+
 
   useEffect(() => {
     if (token) {
-      dispatch(fetchEmergencyLoanFromLocal(token))
+      dispatch(fetchEmergencyLoan(token))
     }
   }, [dispatch, token])
 
@@ -48,23 +51,31 @@ export default function EmergencyLoanPage() {
         <BillCard />
 
         {/* Tombol bayar tagihan */}
-        <button
-          onClick={() => setModalOpen(true)}
-          className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
-        >
-          Bayar Tagihan
-        </button>
+        {eligible && !hasPaid && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
+          >
+            Bayar Tagihan
+          </button>
+        )}
+        {/* Informasi saldo */}
+        <EmergencyVideo />
 
-        {/* Tab navigasi */}
-        <EmergencyTabs active={activeTab} onTabChange={setActiveTab} />
+        {/* Informasi darurat */}
+        <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
 
         {/* Konten berdasarkan tab */}
         {activeTab === 'paket' ? (
-          <>
-            <EmergencyVideo />
-            <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
-            <EmergencyPackages onSelect={handleSelectProduct} />
-          </>
+          eligible ? (
+            <>
+              <EmergencyTabs active={activeTab} onTabChange={setActiveTab} />
+              <EmergencyPackages onSelect={handleSelectProduct} />
+            </>
+          ) : (
+            <p className="mt-6 text-sm text-center text-gray-500">
+            </p>
+          )
         ) : (
           <EmergencyBalance />
         )}
@@ -94,3 +105,5 @@ export default function EmergencyLoanPage() {
     </div>
   )
 }
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
+

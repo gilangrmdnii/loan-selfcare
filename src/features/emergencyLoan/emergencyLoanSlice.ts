@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getEmergencyLoanData } from './emergencyLoanAPI'
 
 export interface EmergencyLoanState {
     msisdn: string | null
@@ -10,7 +9,10 @@ export interface EmergencyLoanState {
     value: number | null
     loading: boolean
     error: string | null
+    eligible: boolean
+    hasPaid: boolean
 }
+
 
 const initialState: EmergencyLoanState = {
     msisdn: null,
@@ -21,32 +23,25 @@ const initialState: EmergencyLoanState = {
     value: null,
     loading: false,
     error: null,
+    eligible: true,
+    hasPaid: false,
 }
-
-export const fetchEmergencyLoanFromLocal = createAsyncThunk(
-    'emergencyLoan/fetchFromLocalProxy',
-    async (token: string, { rejectWithValue }) => {
-        try {
-            const res = await fetch(`/api/proxy-get-link?token=${token}`)
-            if (!res.ok) throw new Error('Failed proxy request')
-            return await res.json()
-        } catch {
-            return rejectWithValue('Gagal ambil data pinjaman darurat (proxy).')
-        }
-    }
-)
-
 
 export const fetchEmergencyLoan = createAsyncThunk(
     'emergencyLoan/fetchEmergencyLoan',
     async (token: string, { rejectWithValue }) => {
         try {
-            return await getEmergencyLoanData(token)
+            const res = await fetch(`/api/emergency-loan?token=${token}`)
+            if (!res.ok) throw new Error('Failed to fetch')
+
+            const data = await res.json()
+            return data
         } catch {
             return rejectWithValue('Failed to fetch emergency loan data.')
         }
     }
 )
+
 
 const emergencyLoanSlice = createSlice({
     name: 'emergencyLoan',
@@ -60,25 +55,24 @@ const emergencyLoanSlice = createSlice({
                 state.error = null
             })
             .addCase(fetchEmergencyLoan.fulfilled, (state, action) => {
-                Object.assign(state, action.payload, { loading: false })
+                const data = action.payload
+
+                state.loading = false
+                state.msisdn = data.msisdn
+                state.transactionID = data.transaction_id ?? null
+                state.uuid = data.uuid ?? null
+                state.oustanding = data.oustanding ?? 0
+                state.offerCommercialName = data.offerCommercialName?.trim?.() ?? null
+                state.value = data.value ?? 0
+                state.eligible = data.status_to_loan ?? false 
+                state.hasPaid = data.oustanding === 0
             })
             .addCase(fetchEmergencyLoan.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload as string
+
             })
 
-            // 👇 tambahan untuk proxy (local API)
-            .addCase(fetchEmergencyLoanFromLocal.pending, (state) => {
-                state.loading = true
-                state.error = null
-            })
-            .addCase(fetchEmergencyLoanFromLocal.fulfilled, (state, action) => {
-                Object.assign(state, action.payload, { loading: false })
-            })
-            .addCase(fetchEmergencyLoanFromLocal.rejected, (state, action) => {
-                state.loading = false
-                state.error = action.payload as string
-            })
     },
 })
 
