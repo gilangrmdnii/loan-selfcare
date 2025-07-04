@@ -8,28 +8,34 @@ import TermsModal from '@/components/TermsModal'
 
 const dummyProducts: Product[] = [
     {
+        id: '1',
         name: 'Saldo Darurat 5Rb',
         quota: '5.000',
         duration: '2 Hari',
-        price: 'Rp7.000',
-        promoPrice: '',
+        price: 7000,
+        promoPrice: null,
         description: 'Saldo darurat sebesar 5rb untuk kebutuhan mendesak.',
+        terms: 'Saldo akan ditagihkan saat isi ulang berikutnya.',
     },
     {
+        id: '2',
         name: 'Saldo Darurat 10Rb',
         quota: '10.000',
         duration: '3 Hari',
-        price: 'Rp14.000',
-        promoPrice: '',
+        price: 14000,
+        promoPrice: 12000,
         description: 'Saldo darurat sebesar 10rb berlaku 3 hari.',
+        terms: 'Promo berlaku hingga akhir bulan.',
     },
     {
+        id: '3',
         name: 'Saldo Darurat 20Rb',
         quota: '20.000',
         duration: '3 Hari',
-        price: 'Rp28.000',
-        promoPrice: '',
+        price: 28000,
+        promoPrice: null,
         description: 'Saldo darurat sebesar 20rb berlaku 3 hari.',
+        terms: 'Harga normal akan berlaku jika tidak ada promo.',
     },
 ]
 

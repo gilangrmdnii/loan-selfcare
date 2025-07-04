@@ -1,5 +1,6 @@
 'use client'
 
+import { useAppSelector } from '@/store/hooks'
 import { useRouter } from 'next/navigation'
 
 export default function ConfirmModal({
@@ -10,6 +11,7 @@ export default function ConfirmModal({
     onClose: () => void
 }) {
     const router = useRouter()
+    const { msisdn, oustanding } = useAppSelector((state) => state.emergencyLoan)
 
     if (!isOpen) return null
 
@@ -30,10 +32,12 @@ export default function ConfirmModal({
 
                 {/* Info Section */}
                 <div className="mb-4">
-                    <p className="text-sm text-gray-500">Prabayar 081234567890</p>
+                    <p className="text-sm text-gray-500">Prabayar {msisdn || '-'}</p>
                     <div className="flex justify-between items-center">
                         <h2 className="text-base font-bold text-[#0F1B60]">Tagihan Anda</h2>
-                        <span className="text-red-600 font-bold text-lg">Rp12.000</span>
+                        <span className="text-red-600 font-bold text-lg">
+                            Rp{oustanding?.toLocaleString('id-ID') || '0'}
+                        </span>
                     </div>
                 </div>
 

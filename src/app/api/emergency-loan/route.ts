@@ -4,6 +4,7 @@ import axios from 'axios'
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
+const BASE_URL = process.env.BASE_URL! // tambahkan ini di .env
 
 function buildHeaders() {
   const timestamp = Math.floor(Date.now() / 1000).toString()
@@ -11,7 +12,7 @@ function buildHeaders() {
   const signature = crypto
     .createHmac('sha256', SECRET_KEY)
     .update(raw)
-    .digest('hex')  
+    .digest('hex')
 
   console.log('[HEADER] Timestamp:', timestamp)
   console.log('[HEADER] Raw string:', raw)
@@ -40,13 +41,12 @@ export async function GET(req: NextRequest) {
     const headers = buildHeaders()
 
     console.log('[STEP 1] Fetching /get-link with token...')
-
     const linkRes = await axios.get(
-      `https://api-loena-miniapps.nuncorp.id/api/v1/get-link/${token}`,
+      `${BASE_URL}/api/v1/get-link/${token}`,
       { headers }
     )
-    console.log('[STEP 1] /get-link response status:', linkRes.status)
 
+    console.log('[STEP 1] /get-link response status:', linkRes.status)
     const linkJson = linkRes.data
     console.log('[STEP 1] /get-link response data:', linkJson)
 
@@ -55,8 +55,7 @@ export async function GET(req: NextRequest) {
     console.log('[INFO] transactionID:', transactionID)
     console.log('[INFO] uuid:', uuid)
 
-    const profileURL =
-      `https://api-loena-miniapps.nuncorp.id/api/v1/loena/profile?` +
+    const profileURL = `${BASE_URL}/api/v1/loena/profile?` +
       `filter_history=false&msisdn=${msisdn}&transaction_id=${transactionID}` +
       `&payment_reminder_history=false&filter_history_num=0`
 
@@ -65,7 +64,6 @@ export async function GET(req: NextRequest) {
 
     const profileRes = await axios.get(profileURL, { headers })
     console.log('[STEP 2] profile response status:', profileRes.status)
-
     const profileJson = profileRes.data
     console.log('[STEP 2] profile data:', profileJson)
 

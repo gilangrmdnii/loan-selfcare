@@ -17,6 +17,17 @@ export default function LoanHistoryClient() {
   const dispatch = useAppDispatch()
   const { paid, payment, loading } = useAppSelector((state) => state.loanHistory)
 
+  function formatDateTime(dateStr: string): string {
+    const date = new Date(dateStr)
+    return date.toLocaleString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
   useEffect(() => {
     if (msisdn && transactionId) {
       dispatch(fetchLoanHistory({ msisdn, transactionId }))
@@ -41,28 +52,47 @@ export default function LoanHistoryClient() {
           <p className="mt-6 text-center text-sm">Memuat data...</p>
         ) : activeTab === 'pinjaman' ? (
           paid.length > 0 ? (
-            <ul className="mt-4 space-y-4">
+            <ul className="mt-4 space-y-3">
               {paid.map((item, i) => (
-                <li key={i} className="text-sm text-[#0F1B60] border p-3 rounded">
-                  <p className="font-semibold">{item.offerDescription || 'Paket Darurat'}</p>
-                  <p className="text-gray-600 text-xs italic">{item.offerCommercialName || '-'}</p>
-                  <p className="mt-1">Nominal: Rp{item.value.toLocaleString('id-ID')}</p>
-                  <p className="text-xs text-gray-500">Mulai: {item.initial_date}</p>
-                  <p className="text-xs text-gray-500">Jatuh Tempo: {item.due_date}</p>
+                <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
+                  <p className="text-sm font-semibold">
+                    Pembelian Paket Darurat {item.value.toLocaleString('id-ID')}
+                  </p>
+
+                  <div className="mt-2 flex justify-between text-xs text-gray-500">
+                    <p>Tanggal Transaksi</p>
+                    <p>{formatDateTime(item.initial_date)}</p>
+                  </div>
+
+                  <div className="mt-1 flex justify-between text-xs text-gray-500">
+                    <p>Harga</p>
+                    <p className="font-bold text-[#0F1B60]">Rp{item.value.toLocaleString('id-ID')}</p>
+                  </div>
                 </li>
               ))}
             </ul>
+
           ) : (
             <EmptyState label="Belum Ada Riwayat Pinjaman" />
           )
         ) : (
           payment.length > 0 ? (
-            <ul className="mt-4 space-y-4">
-              {payment.map((item, i) => (
-                <li key={i} className="text-sm text-[#0F1B60] border p-3 rounded">
-                  <p>{item.transaction_id}</p>
-                  <p>{item.value.toLocaleString()} Rupiah</p>
-                  <p>{item.date}</p>
+            <ul className="mt-4 space-y-3">
+              {paid.map((item, i) => (
+                <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
+                  <p className="text-sm font-semibold">
+                    Pembelian Paket Darurat {item.value.toLocaleString('id-ID')}
+                  </p>
+
+                  <div className="mt-2 flex justify-between text-xs text-gray-500">
+                    <p>Tanggal Transaksi</p>
+                    <p>{formatDateTime(item.initial_date)}</p>
+                  </div>
+
+                  <div className="mt-1 flex justify-between text-xs text-gray-500">
+                    <p>Harga</p>
+                    <p className="font-bold text-[#0F1B60]">Rp{item.value.toLocaleString('id-ID')}</p>
+                  </div>
                 </li>
               ))}
             </ul>

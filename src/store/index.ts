@@ -3,12 +3,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import emergencyLoanReducer from '@/features/emergencyLoan/emergencyLoanSlice'
 import loanHistoryReducer from '@/features/loanHistory/loanHistorySlice'
+import emergencyPackagesReducer from '@/features/emergencyPackages/emergencyPackagesSlice'
 
 export const makeStore = () =>
   configureStore({
     reducer: {
       emergencyLoan: emergencyLoanReducer,
       loanHistory: loanHistoryReducer,
+      emergencyPackages: emergencyPackagesReducer,
     },
   })
 

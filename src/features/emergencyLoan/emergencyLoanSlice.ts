@@ -59,7 +59,7 @@ const emergencyLoanSlice = createSlice({
                 console.log('[DEBUG] fetchEmergencyLoan fulfilled payload:', data)
                 state.loading = false
                 state.msisdn = data.msisdn
-                state.transactionID = data.transaction_id ?? null
+                state.transactionID = data.transactionID ?? null
                 state.uuid = data.uuid ?? null
                 state.oustanding = data.oustanding ?? 0
                 state.offerCommercialName = data.offerCommercialName?.trim?.() ?? null

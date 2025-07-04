@@ -16,9 +16,8 @@ import EmergencyBalance from '@/components/EmergencyBalance'
 import TermsModal from '@/components/TermsModal'
 import ConfirmModal from '@/components/ConfirmModal'
 import ProductModal from '@/components/ProductModal'
+
 import { Product } from '@/types/ProductType'
-import { useSelector, TypedUseSelectorHook } from 'react-redux'
-import { RootState } from '@/store'
 
 export default function EmergencyLoanPage() {
   const dispatch = useAppDispatch()
@@ -30,8 +29,6 @@ export default function EmergencyLoanPage() {
   const [activeTab, setActiveTab] = useState<'paket' | 'saldo'>('paket')
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const { eligible, hasPaid } = useAppSelector((state) => state.emergencyLoan)
-
 
   useEffect(() => {
     if (token) {
@@ -51,31 +48,25 @@ export default function EmergencyLoanPage() {
         <BillCard />
 
         {/* Tombol bayar tagihan */}
-        {eligible && !hasPaid && (
-          <button
-            onClick={() => setModalOpen(true)}
-            className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
-          >
-            Bayar Tagihan
-          </button>
-        )}
-        {/* Informasi saldo */}
-        <EmergencyVideo />
+        <button
+          onClick={() => setModalOpen(true)}
+          className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
+        >
+          Bayar Tagihan
+        </button>
 
-        {/* Informasi darurat */}
-        <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
+        {/* Tab navigasi */}
+        <EmergencyTabs active={activeTab} onTabChange={setActiveTab} />
 
         {/* Konten berdasarkan tab */}
         {activeTab === 'paket' ? (
-          eligible ? (
-            <>
-              <EmergencyTabs active={activeTab} onTabChange={setActiveTab} />
-              <EmergencyPackages onSelect={handleSelectProduct} />
-            </>
-          ) : (
-            <p className="mt-6 text-sm text-center text-gray-500">
-            </p>
-          )
+          <>
+            <EmergencyVideo />
+            <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
+            {token && (
+              <EmergencyPackages msisdn={token} onSelect={handleSelectProduct} />
+            )}
+          </>
         ) : (
           <EmergencyBalance />
         )}
@@ -105,5 +96,3 @@ export default function EmergencyLoanPage() {
     </div>
   )
 }
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
-

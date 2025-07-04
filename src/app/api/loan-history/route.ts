@@ -4,6 +4,7 @@ import crypto from 'crypto'
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
+const BASE_URL = process.env.BASE_URL! // <-- pastikan ada di .env
 
 function buildHeaders() {
   const timestamp = Math.floor(Date.now() / 1000).toString()
@@ -11,7 +12,7 @@ function buildHeaders() {
   const signature = crypto
     .createHmac('sha256', SECRET_KEY)
     .update(raw)
-    .digest('hex') 
+    .digest('hex')
 
   console.log('[HEADER] Timestamp:', timestamp)
   console.log('[HEADER] Raw string:', raw)
@@ -37,7 +38,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const headers = buildHeaders()
-    const url = `https://api-loena-miniapps.nuncorp.id/api/v1/loena/profile?filter_history=true&msisdn=${msisdn}&transaction_id=${transactionId}&payment_reminder_history=true&filter_history_num=5`
+
+    // ✅ Gunakan BASE_URL dari environment
+    const url = `${BASE_URL}/api/v1/loena/profile?filter_history=true&msisdn=${msisdn}&transaction_id=${transactionId}&payment_reminder_history=true&filter_history_num=5`
 
     console.log('[API] Requesting to:', url)
 

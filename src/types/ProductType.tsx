@@ -1,8 +1,10 @@
 export interface Product {
+  id: string
   name: string
-  quota: string
-  duration: string
-  price: string
-  promoPrice?: string
   description: string
+  terms: string
+  quota: string
+  price: number
+  promoPrice?: number | null
+  duration: string
 }
