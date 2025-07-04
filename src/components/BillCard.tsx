@@ -8,7 +8,7 @@ export default function BillCard() {
     offerCommercialName,
     loading,
     transactionID,
-    eligible,
+    // eligible, // ← KOMEN SAJA
     hasPaid,
   } = useAppSelector((state) => state.emergencyLoan)
 
@@ -16,18 +16,19 @@ export default function BillCard() {
     return <p className="text-sm text-gray-500 mt-4">Memuat tagihan...</p>
   }
 
-  if (!eligible) {
-    return (
-      <div className="bg-yellow-50 rounded-xl mt-4 p-4 shadow-sm">
-        <h2 className="font-semibold text-base text-gray-800 mb-1">
-          Fitur Belum Tersedia
-        </h2>
-        <p className="text-sm text-gray-600">
-          Maaf, untuk saat ini fitur pinjaman belum tersedia untuk nomor Anda.
-        </p>
-      </div>
-    )
-  }
+  // ✅ HAPUS BLOK INI SAJA —> kondisi fitur belum tersedia
+  // if (!eligible) {
+  //   return (
+  //     <div className="bg-yellow-50 rounded-xl mt-4 p-4 shadow-sm">
+  //       <h2 className="font-semibold text-base text-gray-800 mb-1">
+  //         Fitur Belum Tersedia
+  //       </h2>
+  //       <p className="text-sm text-gray-600">
+  //         Maaf, untuk saat ini fitur pinjaman belum tersedia untuk nomor Anda.
+  //       </p>
+  //     </div>
+  //   )
+  // }
 
   if (hasPaid) {
     return (

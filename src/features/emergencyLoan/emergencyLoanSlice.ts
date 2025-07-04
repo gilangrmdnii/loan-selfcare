@@ -56,7 +56,7 @@ const emergencyLoanSlice = createSlice({
             })
             .addCase(fetchEmergencyLoan.fulfilled, (state, action) => {
                 const data = action.payload
-
+                console.log('[DEBUG] fetchEmergencyLoan fulfilled payload:', data)
                 state.loading = false
                 state.msisdn = data.msisdn
                 state.transactionID = data.transaction_id ?? null
@@ -64,7 +64,7 @@ const emergencyLoanSlice = createSlice({
                 state.oustanding = data.oustanding ?? 0
                 state.offerCommercialName = data.offerCommercialName?.trim?.() ?? null
                 state.value = data.value ?? 0
-                state.eligible = data.status_to_loan ?? false 
+                state.eligible = true
                 state.hasPaid = data.oustanding === 0
             })
             .addCase(fetchEmergencyLoan.rejected, (state, action) => {
