@@ -5,17 +5,22 @@ export interface LoanRecord {
     offerCommercialName: string | null
     value: number
     initial_date: string
-    due_date: string
+    channel_transaction_id: string
+    channelId: string | null
+    status: 'PAID' | 'UNPAID'
 }
 
 export interface PaymentRecord {
+    transaction_id: string
     value: number
     date: string
-    transaction_id: string
+    productName: string | null
+    channelId: string | null
 }
 
 export interface LoanHistoryState {
     paid: LoanRecord[]
+    unpaid: LoanRecord[]
     payment: PaymentRecord[]
     loading: boolean
     error: string | null
@@ -23,6 +28,7 @@ export interface LoanHistoryState {
 
 const initialState: LoanHistoryState = {
     paid: [],
+    unpaid: [],
     payment: [],
     loading: false,
     error: null,
@@ -30,23 +36,58 @@ const initialState: LoanHistoryState = {
 
 export const fetchLoanHistory = createAsyncThunk(
     'loanHistory/fetch',
-    async ({ msisdn, transactionId }: { msisdn: string; transactionId: string }, { rejectWithValue }) => {
+    async ({ msisdn }: { msisdn: string }, { rejectWithValue }) => {
         try {
-            const res = await fetch(`/api/loan-history?msisdn=${msisdn}&transaction_id=${transactionId}`)
+            const res = await fetch(`/api/loan-history?msisdn=${msisdn}`)
             if (!res.ok) throw new Error('Failed to fetch')
             const data = await res.json()
+
+            interface LoanApiItem {
+                productName: string | null
+                value: number
+                createdAt: string
+                transactionId: string
+                channelId: string | null
+                status: 'PAID' | 'UNPAID'
+            }
+
+            interface PaymentApiItem {
+                transactionId: string
+                paidAmount: number
+                createdAt: string
+                productName: string | null
+                channelId: string | null
+            }
+
             return {
-                paid: (data.data.paid_record ?? []).map((item: Record<string, unknown>) => ({
-                    offerDescription: item.offerDescription as string | null,
-                    offerCommercialName: (item['offerCommercialName '] as string | null) ?? null,
-                    value: item.value as number,
-                    initial_date: item.initial_date as string,
-                    due_date: item.due_date as string,
-                })),
-                payment: (data.data.payment_record ?? []).map((item: Record<string, unknown>) => ({
-                    transaction_id: item.transaction_id as string,
-                    value: item.value as number,
-                    date: item.date as string,
+                paid: (data.data.loans ?? [])
+                    .filter((item: LoanApiItem) => item.status === 'PAID')
+                    .map((item: LoanApiItem) => ({
+                        offerDescription: item.productName ?? null,
+                        offerCommercialName: item.productName ?? null,
+                        value: item.value,
+                        initial_date: item.createdAt,
+                        channel_transaction_id: item.transactionId,
+                        channelId: item.channelId ?? null,
+                        status: 'PAID',
+                    })),
+                unpaid: (data.data.loans ?? [])
+                    .filter((item: LoanApiItem) => item.status === 'UNPAID')
+                    .map((item: LoanApiItem) => ({
+                        offerDescription: item.productName ?? null,
+                        offerCommercialName: item.productName ?? null,
+                        value: item.value,
+                        initial_date: item.createdAt,
+                        channel_transaction_id: item.transactionId,
+                        channelId: item.channelId ?? null,
+                        status: 'UNPAID',
+                    })),
+                payment: (data.data.payments ?? []).map((item: PaymentApiItem) => ({
+                    transaction_id: item.transactionId,
+                    value: item.paidAmount,
+                    date: item.createdAt,
+                    productName: item.productName ?? null,
+                    channelId: item.channelId ?? null,
                 })),
             }
         } catch {
@@ -68,6 +109,7 @@ const loanHistorySlice = createSlice({
             .addCase(fetchLoanHistory.fulfilled, (state, action) => {
                 state.loading = false
                 state.paid = action.payload.paid
+                state.unpaid = action.payload.unpaid
                 state.payment = action.payload.payment
             })
             .addCase(fetchLoanHistory.rejected, (state, action) => {

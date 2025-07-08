@@ -12,10 +12,15 @@ export default function LoanHistoryClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const msisdn = searchParams.get('msisdn')
-  const transactionId = searchParams.get('transaction_id')
 
   const dispatch = useAppDispatch()
-  const { paid, payment, loading } = useAppSelector((state) => state.loanHistory)
+  const { paid, unpaid, payment, loading } = useAppSelector((state) => state.loanHistory)
+
+  const combinedLoans = [...unpaid.map(item => ({ ...item, status: 'UNPAID' })), ...paid.map(item => ({ ...item, status: 'PAID' }))]
+
+  const sortedLoans = combinedLoans.sort(
+    (a, b) => new Date(b.initial_date).getTime() - new Date(a.initial_date).getTime()
+  )
 
   function formatDateTime(dateStr: string): string {
     const date = new Date(dateStr)
@@ -28,11 +33,23 @@ export default function LoanHistoryClient() {
     })
   }
 
+  function mapChannelId(channelId: string | null): string {
+    if (!channelId) return ''
+    if (channelId === 'i1') return 'MyTelkomsel Basic'
+    return channelId
+  }
+
+  function getStatusLabel(status: string): { label: string; color: string } {
+    if (status === 'UNPAID') return { label: 'Belum Lunas', color: 'text-red-600' }
+    // Kamu bisa tambahkan logika Lunas Sebagian jika ada field pembanding
+    return { label: 'Lunas', color: 'text-green-600' }
+  }
+
   useEffect(() => {
-    if (msisdn && transactionId) {
-      dispatch(fetchLoanHistory({ msisdn, transactionId }))
+    if (msisdn) {
+      dispatch(fetchLoanHistory({ msisdn }))
     }
-  }, [msisdn, transactionId, dispatch])
+  }, [msisdn, dispatch])
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-between">
@@ -51,59 +68,81 @@ export default function LoanHistoryClient() {
         {loading ? (
           <p className="mt-6 text-center text-sm">Memuat data...</p>
         ) : activeTab === 'pinjaman' ? (
-          paid.length > 0 ? (
+          sortedLoans.length > 0 ? (
             <ul className="mt-4 space-y-3">
-              {paid.map((item, i) => (
-                <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
-                  <p className="text-sm font-semibold">
-                    Pembelian Paket Darurat {item.value.toLocaleString('id-ID')}
-                  </p>
+              {sortedLoans.map((item, i) => {
+                const statusInfo = getStatusLabel(item.status)
+                return (
+                  <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
+                    <p className="text-sm font-semibold">
+                      {item.offerDescription || 'Pinjaman Darurat'}
+                    </p>
 
-                  <div className="mt-2 flex justify-between text-xs text-gray-500">
-                    <p>Tanggal Transaksi</p>
-                    <p>{formatDateTime(item.initial_date)}</p>
-                  </div>
+                    <div className="mt-2 flex justify-between text-xs text-gray-500">
+                      <p>Order ID</p>
+                      <p>{item.channel_transaction_id}</p>
+                    </div>
 
-                  <div className="mt-1 flex justify-between text-xs text-gray-500">
-                    <p>Harga</p>
-                    <p className="font-bold text-[#0F1B60]">Rp{item.value.toLocaleString('id-ID')}</p>
-                  </div>
-                </li>
-              ))}
+                    <div className="mt-1 flex justify-between text-xs text-gray-500">
+                      <p>Tanggal Transaksi</p>
+                      <p>{formatDateTime(item.initial_date)}</p>
+                    </div>
+
+                    <div className="mt-1 flex justify-between text-xs text-gray-500">
+                      <p>Melalui</p>
+                      <p>{mapChannelId(item.channelId ?? null)}</p>
+                    </div>
+
+                    <div className="mt-1 flex justify-between text-xs text-gray-500">
+                      <p>Harga</p>
+                      <p className="font-bold text-[#0F1B60]">Rp{item.value.toLocaleString('id-ID')}</p>
+                    </div>
+
+                    <div className="mt-1 flex justify-between text-xs text-gray-500">
+                      <p>Status</p>
+                      <p className={`${statusInfo.color} font-semibold`}>{statusInfo.label}</p>
+                    </div>
+
+                    {item.status === 'UNPAID' && (
+                      <div className="mt-2 flex justify-center">
+                        <button className="text-xs text-blue-600 font-bold">Bayar Sekarang</button>
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
-
           ) : (
             <EmptyState label="Belum Ada Riwayat Pinjaman" />
           )
         ) : (
-          payment.length > 0 ? (
-            <ul className="mt-4 space-y-3">
-              {paid.map((item, i) => (
-                <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
-                  <p className="text-sm font-semibold">
-                    Pembelian Paket Darurat {item.value.toLocaleString('id-ID')}
+          <ul className="mt-4 space-y-3">
+            {payment.map((item, i) => (
+              <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
+                <p className="text-sm font-semibold">
+                  Pembayaran {item.productName ? item.productName : 'Paket Darurat'}
+                </p>
+
+                <div className="mt-2 flex justify-between text-xs text-gray-500">
+                  <p>Tanggal Pembayaran</p>
+                  <p>{formatDateTime(item.date)}</p>
+                </div>
+
+                <div className="mt-1 flex justify-between text-xs text-gray-500">
+                  <p>Melalui</p>
+                  <p>{mapChannelId(item.channelId)}</p>
+                </div>
+
+                <div className="mt-1 flex justify-between text-xs text-gray-500">
+                  <p>Jumlah Dibayar</p>
+                  <p className="font-bold text-[#0F1B60]">
+                    Rp{item.value.toLocaleString('id-ID')}
                   </p>
-
-                  <div className="mt-2 flex justify-between text-xs text-gray-500">
-                    <p>Tanggal Transaksi</p>
-                    <p>{formatDateTime(item.initial_date)}</p>
-                  </div>
-
-                  <div className="mt-1 flex justify-between text-xs text-gray-500">
-                    <p>Harga</p>
-                    <p className="font-bold text-[#0F1B60]">Rp{item.value.toLocaleString('id-ID')}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState label="Belum Ada Riwayat Pembayaran" />
-          )
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
-      </div>
-
-      <div className="px-4 py-5 border-t border-gray-100 w-full max-w-screen-sm mx-auto">
-        <button onClick={() => router.push('/emergency')} className="w-full bg-red-600 text-white font-semibold py-3 rounded-full text-sm">Pilih Paket Darurat</button>
       </div>
     </div>
   )
