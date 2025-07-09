@@ -1,33 +1,36 @@
-// src/app/api/emergency-loan/route.ts
+// src/app/api/loan-history/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 import axios from 'axios'
-import moment from "moment"
-import CryptoJS from "crypto-js"
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
 
+
 function buildHeaders(custParam: string) {
-  const timestamp = moment().unix().toString();
-  const plainText = API_KEY + SECRET_KEY + timestamp;
-  const sha256Hash = CryptoJS.SHA256(plainText);
-  const base64 = CryptoJS.enc.Base64.stringify(sha256Hash);
+  const timestamp = Math.floor(Date.now() / 1000).toString()
+  const raw = API_KEY + timestamp
+  const signature = crypto
+    .createHmac('sha256', SECRET_KEY)
+    .update(raw)
+    .digest('hex')
+    
 
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
-    'X-SIGNATURE': base64,
-    'X-CUST-PARAM': custParam,
+    'X-Signature': signature,
+    'x-cust-param': custParam,
     'Content-Type': 'application/json',
   }
 }
 
 export async function GET(req: NextRequest) {
-  const custParam = req.headers.get('x-cust-param')
+  const custParam = req.headers.get('x-cust-param') || req.cookies.get('custParam')?.value
 
-  console.log('[API] GET /api/emergency-loan')
+  console.log('[API] GET /api/loan-history')
   console.log('[HEADER] x-cust-param:', custParam)
 
   if (!custParam) {
@@ -37,23 +40,19 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  const headers = buildHeaders(custParam)
-
-  console.log('[HEADER] headers:', headers)
-
-  const url = `${BASE_URL}/api/v1/offers/balance`
-
-  console.log('[STEP] Fetching from:', url)
-
   try {
-    const response = await axios.get(url, { headers })
-    console.log('[STEP] Response status:', response.status)
-    const data = response.data
-    console.log('[STEP] Response data:', data)
+    const headers = buildHeaders(custParam)
 
-    return NextResponse.json(data)
+    const url = `${BASE_URL}/api/v1/offers/balance`
+    console.log('[STEP] Fetching loan profile from:', url)
+
+    const response = await axios.get(url, { headers })
+
+    console.log('[STEP] Response status:', response.status)
+    return NextResponse.json(response.data)
   } catch (error: unknown) {
-    console.error('[ERROR] Failed to fetch balance')
+    console.error('[ERROR] Failed to fetch loan history')
+
     if (axios.isAxiosError(error)) {
       console.error('[AxiosError]', error.response?.data || error.message)
     } else if (error instanceof Error) {
@@ -62,9 +61,6 @@ export async function GET(req: NextRequest) {
       console.error('[Unknown Error]', error)
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch balance data' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch loan history' }, { status: 500 })
   }
 }

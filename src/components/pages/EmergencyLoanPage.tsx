@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAppDispatch } from '@/store/hooks'
-import { fetchEmergencyLoan } from '@/features/emergencyLoan/emergencyLoanSlice'
 
 // Komponen UI
 import Header from '@/components/Header'
@@ -19,6 +18,7 @@ import ProductModal from '@/components/ProductModal'
 
 import { Product } from '@/types/ProductType'
 import { getTokenFromSearchOrCookie } from '@/utils/token'
+import { fetchLoanHistory } from '@/features/loanHistory/loanHistorySlice'
 
 export default function EmergencyLoanPage() {
   const dispatch = useAppDispatch()
@@ -34,7 +34,7 @@ export default function EmergencyLoanPage() {
   useEffect(() => {
     const token = getTokenFromSearchOrCookie(raw)
     if (token) {
-      dispatch(fetchEmergencyLoan(token))
+      dispatch(fetchLoanHistory(token))
     }
   }, [raw, dispatch])
 

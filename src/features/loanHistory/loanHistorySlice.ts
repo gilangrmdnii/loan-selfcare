@@ -4,6 +4,7 @@ export interface LoanRecord {
   offerDescription: string | null
   offerCommercialName: string | null
   value: number
+  outstanding: number | null
   initial_date: string
   channel_transaction_id: string
   channelId: string | null
@@ -13,6 +14,7 @@ export interface LoanRecord {
 export interface PaymentRecord {
   transaction_id: string
   value: number
+  outstanding: number | null
   date: string
   productName: string | null
   channelId: string | null
@@ -22,6 +24,7 @@ export interface LoanHistoryState {
   paid: LoanRecord[]
   unpaid: LoanRecord[]
   payment: PaymentRecord[]
+  outstanding: number | null
   loading: boolean
   error: string | null
 }
@@ -29,19 +32,22 @@ export interface LoanHistoryState {
 const initialState: LoanHistoryState = {
   paid: [],
   unpaid: [],
+  outstanding: null,
   payment: [],
   loading: false,
   error: null,
 }
 
-// ✅ Thunk yang tidak butuh parameter, karena backend baca dari cookie
 export const fetchLoanHistory = createAsyncThunk(
   'loanHistory/fetch',
-  async (_: void, { rejectWithValue }) => {
+  async (token: string, { rejectWithValue }) => {
     try {
       const res = await fetch('/api/loan-history', {
         method: 'GET',
-        credentials: 'include', // penting untuk kirim cookie
+        headers: {
+          'Content-Type': 'application/json',
+          'x-cust-param': token,
+        },
       })
 
       if (!res.ok) throw new Error('Failed to fetch')
@@ -54,6 +60,7 @@ export const fetchLoanHistory = createAsyncThunk(
         transactionId: string
         channelId: string | null
         status: 'PAID' | 'UNPAID'
+
       }
 
       interface PaymentApiItem {
@@ -75,6 +82,7 @@ export const fetchLoanHistory = createAsyncThunk(
             channel_transaction_id: item.transactionId,
             channelId: item.channelId ?? null,
             status: 'PAID',
+
           })),
         unpaid: (data.data.loans ?? [])
           .filter((item: LoanApiItem) => item.status === 'UNPAID')
@@ -94,6 +102,7 @@ export const fetchLoanHistory = createAsyncThunk(
           productName: item.productName ?? null,
           channelId: item.channelId ?? null,
         })),
+        outstanding: data.data.outstanding ?? null,
       }
     } catch {
       return rejectWithValue('Gagal memuat riwayat transaksi')
@@ -116,6 +125,7 @@ const loanHistorySlice = createSlice({
         state.paid = action.payload.paid
         state.unpaid = action.payload.unpaid
         state.payment = action.payload.payment
+        state.outstanding = action.payload.outstanding
       })
       .addCase(fetchLoanHistory.rejected, (state, action) => {
         state.loading = false

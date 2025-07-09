@@ -6,11 +6,13 @@ import { fetchLoanHistory } from '@/features/loanHistory/loanHistorySlice'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Header from '@/components/Header'
+import { useSearchParams } from 'next/navigation'
+import { getTokenFromSearchOrCookie } from '@/utils/token'
 
 export default function LoanHistoryClient() {
   const [activeTab, setActiveTab] = useState<'pinjaman' | 'pembayaran'>('pinjaman')
   const router = useRouter()
-
+  const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
   const { paid, unpaid, payment, loading } = useAppSelector((state) => state.loanHistory)
 
@@ -44,8 +46,12 @@ export default function LoanHistoryClient() {
   }
 
   useEffect(() => {
-    dispatch(fetchLoanHistory())
-  }, [dispatch])
+    const rawToken = searchParams.get('token')
+    const token = getTokenFromSearchOrCookie(rawToken)
+    if (token) {
+      dispatch(fetchLoanHistory(token))
+    }
+  }, [dispatch, searchParams])
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-between">

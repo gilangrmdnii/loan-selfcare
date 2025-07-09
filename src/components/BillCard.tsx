@@ -4,25 +4,25 @@ import Link from 'next/link'
 
 export default function BillCard() {
   const {
-    msisdn,
-    amount,
-    offerCommercialName,
+    // msisdn,
+    outstanding,
     loading,
-    // transactionID,
-  } = useAppSelector((state) => state.emergencyLoan)
+    unpaid,
+  } = useAppSelector((state) => state.loanHistory)
 
+  const offerCommercialName = unpaid.length > 0 ? unpaid[0].offerCommercialName : null
   if (loading) {
     return <p className="text-sm text-gray-500 mt-4">Memuat tagihan...</p>
   }
 
   return (
     <div className="bg-gray-50 rounded-xl mt-4 p-4 shadow-sm">
-      <p className="text-xs text-gray-500">Prabayar {msisdn || '-'}</p>
+      <p className="text-xs text-gray-500">Prabayar {'-'}</p>
       <div className="flex justify-between items-center">
         <h2 className="font-semibold text-base text-gray-800">Tagihan Anda</h2>
         <div className="text-right">
           <p className="text-red-600 font-bold text-lg mt-4">
-            Rp{amount?.toLocaleString('id-ID') || '0'}
+            Rp{outstanding?.toLocaleString('id-ID') || '0'}
           </p>
           {/* {msisdn && transactionID && ( */}
           <Link
@@ -45,11 +45,11 @@ export default function BillCard() {
       </div>
       <p className="mt-2 text-sm flex items-center gap-1">
         <span className="text-red-500">⚠</span>
-        <span className="text-gray-500">
+        <p className="text-gray-500">
           {offerCommercialName
             ? `Produk: ${offerCommercialName}`
             : 'Tagihan darurat tersedia'}
-        </span>
+        </p>
       </p>
     </div>
   )

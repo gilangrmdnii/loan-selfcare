@@ -6,12 +6,33 @@ import { fetchEmergencyBalance } from '@/features/emergencyBalance/emergencyBala
 import ProductModal from '@/components/ProductModal'
 import TermsModal from '@/components/TermsModal'
 import { Product } from '@/types/ProductType'
+import { fetchEmergencyLoan } from '@/features/emergencyLoan/emergencyLoanSlice'
+
+// Fungsi parsing tanggal format "Thu Dec 12 23:59:59 WIB 2024"
+function parseWibDate(dateStr: string): Date {
+    const cleaned = dateStr.replace('WIB', '').trim()
+    const parts = cleaned.split(' ')
+
+    // Periksa panjang parts dulu, dan ambil tahun dari posisi terakhir
+    // Contoh parts: ['Thu', 'Dec', '12', '23:59:59', '2024'] atau
+    //              ['Thu', 'Dec', '12', '23:59:59', 'WIB', '2024']
+
+    const year = parts[parts.length - 1] // ambil elemen terakhir sebagai tahun
+    const month = parts[1]
+    const day = parts[2]
+    const time = parts[3]
+
+    const formatted = `${month} ${day} ${year} ${time}`
+
+    return new Date(formatted)
+}
+
 
 export default function EmergencyBalance() {
     const dispatch = useAppDispatch()
 
     const { balances, loading, error } = useAppSelector((state) => state.emergencyBalance)
-
+    const emergencyLoan = useAppSelector((state) => state.emergencyLoan)
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isModalOpen, setModalOpen] = useState(false)
@@ -19,11 +40,30 @@ export default function EmergencyBalance() {
 
     useEffect(() => {
         dispatch(fetchEmergencyBalance())
+        dispatch(fetchEmergencyLoan())
     }, [dispatch])
 
     const handleClickProduct = (product: Product) => {
         setSelectedProduct(product)
         setModalOpen(true)
+    }
+
+    // Parsing tanggal jika ada expiry dan format valid
+    let formattedExpiry = ''
+    if (emergencyLoan.expiry) {
+        try {
+            const parsedDate = parseWibDate(emergencyLoan.expiry)
+            formattedExpiry = parsedDate.toLocaleString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            })
+        } catch {
+            formattedExpiry = emergencyLoan.expiry // fallback tampil apa adanya jika error
+        }
     }
 
     return (
@@ -45,7 +85,25 @@ export default function EmergencyBalance() {
                 </div>
             </div>
 
-          
+            {!emergencyLoan.loading && emergencyLoan.amount !== null && (
+                <div className="bg-gray-100 rounded-xl p-4">
+                    <p className="text-sm text-gray-500">
+                        {emergencyLoan.msisdn ? `Prabayar ${emergencyLoan.msisdn}` : 'Nomor tidak tersedia'}
+                    </p>
+                    <div className="flex justify-between items-center">
+                        <p className="font-bold">Saldo Darurat</p>
+                        <p className="text-red-600 font-bold">
+                            Rp{emergencyLoan.amount.toLocaleString('id-ID')}
+                        </p>
+                    </div>
+                    {emergencyLoan.expiry && (
+                        <p className="text-sm text-gray-500 mt-1">
+                            Sebagian saldo akan kadaluarsa pada{' '}
+                            {formattedExpiry}
+                        </p>
+                    )}
+                </div>
+            )}
 
             {/* Divider */}
             <div className="flex items-center gap-4">
