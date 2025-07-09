@@ -1,7 +1,8 @@
 'use client'
 
-import { useAppSelector } from '@/store/hooks'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useRouter } from 'next/navigation'
+import { initiateUpp } from '@/features/initiateUpp/initiateUppSlice'
 
 export default function ConfirmModal({
     isOpen,
@@ -11,9 +12,32 @@ export default function ConfirmModal({
     onClose: () => void
 }) {
     const router = useRouter()
-    const { msisdn, oustanding } = useAppSelector((state) => state.emergencyLoan)
+    const dispatch = useAppDispatch()
+    const { msisdn, amount } = useAppSelector((state) => state.emergencyLoan)
 
     if (!isOpen) return null
+
+    const handleUpp = async () => {
+        onClose()
+
+        const resultAction = await dispatch(
+            initiateUpp({
+                offerId: '00021523',
+                subscribe: false,
+                version: 'v2',
+                campaignOffer: false,
+                campaignId: 'CPGGL1234567890',
+                campaignTrackingId: 'CPGGL1234567890',
+            })
+        )
+
+        if (initiateUpp.fulfilled.match(resultAction)) {
+            const { redirectUrl } = resultAction.payload as { redirectUrl: string }
+            router.push(redirectUrl) 
+        } else {
+            console.error('Gagal redirect: ', resultAction.payload)
+        }
+    }
 
     return (
         <div
@@ -36,7 +60,7 @@ export default function ConfirmModal({
                     <div className="flex justify-between items-center">
                         <h2 className="text-base font-bold text-[#0F1B60]">Tagihan Anda</h2>
                         <span className="text-red-600 font-bold text-lg">
-                            Rp{oustanding?.toLocaleString('id-ID') || '0'}
+                            Rp{amount?.toLocaleString('id-ID') || '0'}
                         </span>
                     </div>
                 </div>
@@ -51,20 +75,7 @@ export default function ConfirmModal({
                 {/* Buttons */}
                 <div className="space-y-3">
                     <button
-                        onClick={() => {
-                            onClose()
-                            router.push('/payment-method?via=pulsa')
-                        }}
-                        className="w-full bg-red-600 text-white font-semibold py-3 rounded-full"
-                    >
-                        Top up Pulsa
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            onClose()
-                            router.push('/payment-method?via=wallet')
-                        }}
+                        onClick={handleUpp}
                         className="w-full border border-red-500 text-red-600 font-semibold py-3 rounded-full"
                     >
                         Bayar Tagihan via E-Wallet

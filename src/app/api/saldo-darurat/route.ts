@@ -1,4 +1,3 @@
-// /app/api/paket-darurat/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import axios from 'axios'
@@ -40,13 +39,12 @@ export async function GET(req: NextRequest) {
   const custParam = req.headers.get('x-cust-param') || req.cookies.get('custParam')?.value
 
   if (!custParam) {
-    return NextResponse.json({ error: 'Missing custParam' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing x-cust-param' }, { status: 400 })
   }
 
-  // Tanpa transactionId
-  const url =
-    `${BASE_URL}/api/v1/offers?` +
-    `type=PURCHASE&filteredBy=balance&mode=SELF&version=v4&paymentMethod=LOAN`
+  const transactionId = '12345667890'
+
+  const url = `${BASE_URL}/api/v1/offers?type=PURCHASE&transactionId=${transactionId}&filteredBy=balance&mode=SELF&version=v4&paymentMethod=BALANCE`
 
   try {
     const headers = buildHeaders(custParam)
@@ -54,20 +52,20 @@ export async function GET(req: NextRequest) {
 
     const offers = res.data?.data?.offers ?? []
 
-    const mappedOffers = offers.map((item) => ({
+    const products = offers.map((item) => ({
       id: item.id,
       name: item.name,
       description: item.longdesc,
-      terms: '',
       quota: item.quota ?? '-',
+      duration: item.validity ?? '-',
       price: parseInt(item.price ?? '0'),
       promoPrice: null,
-      duration: item.validity ?? '-',
+      terms: '', // tambahkan kalau ada data
     }))
 
-    return NextResponse.json({ offers: mappedOffers })
-  } catch (err) {
-    console.error('Gagal memuat paket darurat:', err)
+    return NextResponse.json({ products })
+  } catch (error) {
+    console.error('[ERROR] Gagal mengambil saldo darurat:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

@@ -1,7 +1,10 @@
-// utils/token.ts
-export function getTokenFromQuery(): string | null {
-  if (typeof window === 'undefined') return null
+import Cookies from 'js-cookie'
 
-  const urlParams = new URLSearchParams(window.location.search)
-  return urlParams.get('token')
+export function getTokenFromSearchOrCookie(rawToken: string | null): string | undefined {
+  const cleanedToken = rawToken?.replace(/^<|>$/g, '')
+  if (cleanedToken) {
+    Cookies.set('custParam', cleanedToken, { path: '/', sameSite: 'strict' })
+    return cleanedToken
+  }
+  return Cookies.get('custParam')
 }

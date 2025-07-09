@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
+
 export interface EmergencyLoanState {
     msisdn: string | null
     transactionID: string | null
@@ -7,12 +8,13 @@ export interface EmergencyLoanState {
     oustanding: number | null
     offerCommercialName: string | null
     value: number | null
+    amount: number | null
+    expiry: string | null
     loading: boolean
     error: string | null
     eligible: boolean
     hasPaid: boolean
 }
-
 
 const initialState: EmergencyLoanState = {
     msisdn: null,
@@ -20,6 +22,8 @@ const initialState: EmergencyLoanState = {
     uuid: null,
     oustanding: null,
     offerCommercialName: null,
+    amount: null,
+    expiry: null,
     value: null,
     loading: false,
     error: null,
@@ -31,7 +35,13 @@ export const fetchEmergencyLoan = createAsyncThunk(
     'emergencyLoan/fetchEmergencyLoan',
     async (token: string, { rejectWithValue }) => {
         try {
-            const res = await fetch(`/api/emergency-loan?token=${token}`)
+            const res = await fetch('/api/emergency-loan', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cust-param': token,
+                },
+            })
             if (!res.ok) throw new Error('Failed to fetch')
 
             const data = await res.json()
@@ -42,14 +52,12 @@ export const fetchEmergencyLoan = createAsyncThunk(
     }
 )
 
-
 const emergencyLoanSlice = createSlice({
     name: 'emergencyLoan',
     initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            // original (fetchEmergencyLoan langsung dari API eksternal)
             .addCase(fetchEmergencyLoan.pending, (state) => {
                 state.loading = true
                 state.error = null
@@ -63,6 +71,8 @@ const emergencyLoanSlice = createSlice({
                 state.uuid = data.uuid ?? null
                 state.oustanding = data.oustanding ?? 0
                 state.offerCommercialName = data.offerCommercialName?.trim?.() ?? null
+                state.amount = parseInt(data.data?.amount ?? '0', 10) || 0
+                state.expiry = data.data?.expiry ?? null
                 state.value = data.value ?? 0
                 state.eligible = true
                 state.hasPaid = data.oustanding === 0

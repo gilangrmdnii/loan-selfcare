@@ -106,6 +106,11 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                 <div className="px-6 pb-6">
                     <button
                         onClick={() => {
+                            if (product) {
+                                // Simpan ke localStorage
+                                localStorage.setItem('selectedProduct', JSON.stringify(product))
+                            }
+
                             onClose()
                             router.push('/payment-loan')
                         }}
@@ -114,6 +119,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                         Aktifkan Sekarang
                     </button>
                 </div>
+
             </div>
         </div>
     )

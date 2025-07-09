@@ -1,12 +1,14 @@
+// src/app/api/emergency-loan/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import axios from 'axios'
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
-const BASE_URL = process.env.BASE_URL! // tambahkan ini di .env
+const BASE_URL = process.env.BASE_URL!
 
-function buildHeaders() {
+function buildHeaders(custParam: string) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
   const raw = API_KEY + timestamp
   const signature = crypto
@@ -14,81 +16,53 @@ function buildHeaders() {
     .update(raw)
     .digest('hex')
 
-  console.log('[HEADER] Timestamp:', timestamp)
-  console.log('[HEADER] Raw string:', raw)
-  console.log('[HEADER] Signature:', signature)
-
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
     'X-Signature': signature,
+    'x-cust-param': custParam,
     'Content-Type': 'application/json',
   }
 }
 
 export async function GET(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get('token')
+  const custParam = req.headers.get('x-cust-param')
 
   console.log('[API] GET /api/emergency-loan')
-  console.log('[API] Received token:', token)
+  console.log('[HEADER] x-cust-param:', custParam)
 
-  if (!token) {
-    console.error('[ERROR] Missing token in query')
-    return NextResponse.json({ error: 'Token is required' }, { status: 400 })
+  if (!custParam) {
+    return NextResponse.json(
+      { error: 'Missing x-cust-param header' },
+      { status: 400 }
+    )
   }
 
+  const headers = buildHeaders(custParam)
+  const url = `${BASE_URL}/api/v1/offers/balance`
+
+  console.log('[STEP] Fetching from:', url)
+
   try {
-    const headers = buildHeaders()
+    const response = await axios.get(url, { headers })
+    console.log('[STEP] Response status:', response.status)
+    const data = response.data
+    console.log('[STEP] Response data:', data)
 
-    console.log('[STEP 1] Fetching /get-link with token...')
-    const linkRes = await axios.get(
-      `${BASE_URL}/api/v1/get-link/${token}`,
-      { headers }
-    )
-
-    console.log('[STEP 1] /get-link response status:', linkRes.status)
-    const linkJson = linkRes.data
-    console.log('[STEP 1] /get-link response data:', linkJson)
-
-    const { msisdn, transactionID, uuid } = linkJson.data
-    console.log('[INFO] msisdn:', msisdn)
-    console.log('[INFO] transactionID:', transactionID)
-    console.log('[INFO] uuid:', uuid)
-
-    const profileURL = `${BASE_URL}/api/v1/loena/profile?` +
-      `filter_history=false&msisdn=${msisdn}&transaction_id=${transactionID}` +
-      `&payment_reminder_history=false&filter_history_num=0`
-
-    console.log('[STEP 2] Fetching profile data...')
-    console.log('[STEP 2] profileURL:', profileURL)
-
-    const profileRes = await axios.get(profileURL, { headers })
-    console.log('[STEP 2] profile response status:', profileRes.status)
-    const profileJson = profileRes.data
-    console.log('[STEP 2] profile data:', profileJson)
-
-    const record = profileJson.data?.unpaid_record?.[0] ?? {}
-
-    const response = {
-      msisdn,
-      transactionID,
-      uuid,
-      oustanding: profileJson.data?.oustanding ?? 0,
-      offerCommercialName: record.offerCommercialName ?? 'Paket Darurat',
-      value: record.value ?? 0,
-    }
-
-    console.log('[SUCCESS] Final response:', response)
-
-    return NextResponse.json(response)
-  } catch (err: unknown) {
-    console.error('[ERROR] Unexpected error occurred in emergency-loan route')
-    if (err instanceof Error) {
-      console.error('[ERROR] Message:', err.message)
-      console.error('[ERROR] Stack:', err.stack)
+    return NextResponse.json(data)
+  } catch (error: unknown) {
+    console.error('[ERROR] Failed to fetch balance')
+    if (axios.isAxiosError(error)) {
+      console.error('[AxiosError]', error.response?.data || error.message)
+    } else if (error instanceof Error) {
+      console.error('[Error]', error.message)
     } else {
-      console.error('[ERROR] Raw:', err)
+      console.error('[Unknown Error]', error)
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    return NextResponse.json(
+      { error: 'Failed to fetch balance data' },
+      { status: 500 }
+    )
   }
 }

@@ -18,23 +18,26 @@ import ConfirmModal from '@/components/ConfirmModal'
 import ProductModal from '@/components/ProductModal'
 
 import { Product } from '@/types/ProductType'
+import { getTokenFromSearchOrCookie } from '@/utils/token'
 
 export default function EmergencyLoanPage() {
   const dispatch = useAppDispatch()
   const searchParams = useSearchParams()
   const raw = searchParams.get('custParam')
-  const token = raw?.replace(/^<|>$/g, '')
-
+  // State untuk modal dan tab
   const [showTermsModal, setShowTermsModal] = useState(false)
   const [activeTab, setActiveTab] = useState<'paket' | 'saldo'>('paket')
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
+
   useEffect(() => {
+    const token = getTokenFromSearchOrCookie(raw)
     if (token) {
       dispatch(fetchEmergencyLoan(token))
     }
-  }, [dispatch, token])
+  }, [raw, dispatch])
+
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product)
@@ -63,9 +66,7 @@ export default function EmergencyLoanPage() {
           <>
             <EmergencyVideo />
             <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
-            {token && (
-              <EmergencyPackages msisdn={token} onSelect={handleSelectProduct} />
-            )}
+            <EmergencyPackages onSelect={handleSelectProduct} />
           </>
         ) : (
           <EmergencyBalance />

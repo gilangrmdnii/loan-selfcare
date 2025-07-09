@@ -1,45 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { fetchEmergencyBalance } from '@/features/emergencyBalance/emergencyBalanceSlice'
 import ProductModal from '@/components/ProductModal'
-import { Product } from '@/types/ProductType'
 import TermsModal from '@/components/TermsModal'
-
-
-const dummyProducts: Product[] = [
-    {
-        id: '1',
-        name: 'Saldo Darurat 5Rb',
-        quota: '5.000',
-        duration: '2 Hari',
-        price: 7000,
-        promoPrice: null,
-        description: 'Saldo darurat sebesar 5rb untuk kebutuhan mendesak.',
-        terms: 'Saldo akan ditagihkan saat isi ulang berikutnya.',
-    },
-    {
-        id: '2',
-        name: 'Saldo Darurat 10Rb',
-        quota: '10.000',
-        duration: '3 Hari',
-        price: 14000,
-        promoPrice: 12000,
-        description: 'Saldo darurat sebesar 10rb berlaku 3 hari.',
-        terms: 'Promo berlaku hingga akhir bulan.',
-    },
-    {
-        id: '3',
-        name: 'Saldo Darurat 20Rb',
-        quota: '20.000',
-        duration: '3 Hari',
-        price: 28000,
-        promoPrice: null,
-        description: 'Saldo darurat sebesar 20rb berlaku 3 hari.',
-        terms: 'Harga normal akan berlaku jika tidak ada promo.',
-    },
-]
+import { Product } from '@/types/ProductType'
 
 export default function EmergencyBalance() {
+    const dispatch = useAppDispatch()
+
+    const { balances, loading, error } = useAppSelector((state) => state.emergencyBalance)
+
     const [phone] = useState('081234567890')
     const [currentBalance] = useState('Rp10.000')
     const [expiredDate] = useState('3 Jun 2025')
@@ -47,6 +19,10 @@ export default function EmergencyBalance() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isModalOpen, setModalOpen] = useState(false)
     const [showTermsModal, setShowTermsModal] = useState(false)
+
+    useEffect(() => {
+        dispatch(fetchEmergencyBalance())
+    }, [dispatch])
 
     const handleClickProduct = (product: Product) => {
         setSelectedProduct(product)
@@ -91,9 +67,12 @@ export default function EmergencyBalance() {
                 <hr className="flex-grow border-gray-200" />
             </div>
 
-            {/* List Paket */}
+            {/* Loading, Error, & Product List */}
+            {loading && <p className="text-center text-sm text-gray-500">Memuat saldo darurat...</p>}
+            {error && <p className="text-center text-sm text-red-500">{error}</p>}
+
             <div className="space-y-3">
-                {dummyProducts.map((item, index) => (
+                {balances.map((item: Product, index: number) => (
                     <button
                         key={index}
                         onClick={() => handleClickProduct(item)}
@@ -104,7 +83,16 @@ export default function EmergencyBalance() {
                                 <p className="font-semibold">{item.name}</p>
                                 <p className="text-sm text-gray-500">{item.duration}</p>
                             </div>
-                            <p className="font-bold text-[#0F1B60]">{item.price}</p>
+                            <div className="text-right">
+                                {item.promoPrice && (
+                                    <p className="text-sm text-gray-400 line-through">
+                                        Rp{item.price.toLocaleString('id-ID')}
+                                    </p>
+                                )}
+                                <p className="font-bold text-[#0F1B60]">
+                                    Rp{(item.promoPrice ?? item.price).toLocaleString('id-ID')}
+                                </p>
+                            </div>
                         </div>
                     </button>
                 ))}
@@ -122,7 +110,6 @@ export default function EmergencyBalance() {
 
             {/* Modal Syarat & Ketentuan */}
             <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
-
         </div>
     )
 }

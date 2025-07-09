@@ -3,15 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { fetchLoanHistory } from '@/features/loanHistory/loanHistorySlice'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Header from '@/components/Header'
 
 export default function LoanHistoryClient() {
   const [activeTab, setActiveTab] = useState<'pinjaman' | 'pembayaran'>('pinjaman')
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const msisdn = searchParams.get('msisdn')
 
   const dispatch = useAppDispatch()
   const { paid, unpaid, payment, loading } = useAppSelector((state) => state.loanHistory)
@@ -46,10 +44,8 @@ export default function LoanHistoryClient() {
   }
 
   useEffect(() => {
-    if (msisdn) {
-      dispatch(fetchLoanHistory({ msisdn }))
-    }
-  }, [msisdn, dispatch])
+    dispatch(fetchLoanHistory())
+  }, [dispatch])
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-between">

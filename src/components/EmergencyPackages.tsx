@@ -1,40 +1,24 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { fetchEmergencyPackages } from '@/features/emergencyPackages/emergencyPackagesSlice'
 import { Product } from '@/types/ProductType'
 
 interface Props {
   onSelect: (product: Product) => void
-  msisdn: string
 }
 
-export default function EmergencyPackages({ onSelect, msisdn }: Props) {
-  const [packages, setPackages] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export default function EmergencyPackages({ onSelect }: Props) {
+  const dispatch = useAppDispatch()
+
+  const { packages, loading, error } = useAppSelector(
+    (state) => state.emergencyPackages
+  )
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(`/api/paket-darurat?msisdn=${msisdn}`)
-        const data = await res.json()
-
-        if (res.ok) {
-          setPackages(data.offers)
-        } else {
-          setError(data.error || 'Gagal memuat paket')
-        }
-      } catch {
-        setError('Terjadi kesalahan saat memuat data')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (msisdn) fetchData()
-  }, [msisdn])
+    dispatch(fetchEmergencyPackages())
+  }, [dispatch])
 
   return (
     <div className="mt-6">
@@ -64,7 +48,8 @@ export default function EmergencyPackages({ onSelect, msisdn }: Props) {
           <div className="mt-2">
             <div className="text-sm font-semibold text-[#0F1B60]">{pkg.name}</div>
             <div className="text-sm font-bold">
-              {pkg.quota} <span className="text-gray-400 font-normal ml-1">{pkg.duration}</span>
+              {pkg.quota}{' '}
+              <span className="text-gray-400 font-normal ml-1">{pkg.duration}</span>
             </div>
           </div>
 

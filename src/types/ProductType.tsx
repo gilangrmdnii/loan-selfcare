@@ -2,9 +2,16 @@ export interface Product {
   id: string
   name: string
   description: string
-  terms: string
-  quota: string
   price: number
   promoPrice?: number | null
-  duration: string
+  quota?: string
+  duration?: string
+  subscribe?: boolean
+  version?: string
+  campaignOffer?: boolean
+  campaignId?: string
+  campaignTrackingId?: string
+}
+export interface ProductWithTerms extends Product {
+  terms: string
 }

@@ -15,9 +15,13 @@ const initialState: EmergencyPackagesState = {
 
 export const fetchEmergencyPackages = createAsyncThunk(
   'emergencyPackages/fetchEmergencyPackages',
-  async (msisdn: string, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }) => {
     try {
-      const res = await fetch(`/api/paket-darurat?msisdn=${msisdn}`)
+      const res = await fetch('/api/paket-darurat', {
+        method: 'GET',
+        credentials: 'include',
+      })
+
       if (!res.ok) throw new Error('Failed to fetch packages')
 
       const data = await res.json()
@@ -27,6 +31,7 @@ export const fetchEmergencyPackages = createAsyncThunk(
     }
   }
 )
+
 
 const emergencyPackagesSlice = createSlice({
   name: 'emergencyPackages',

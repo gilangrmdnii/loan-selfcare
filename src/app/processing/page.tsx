@@ -4,13 +4,44 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { purchaseOffer, selectPurchase } from '@/features/purchaseOffer/purchaseOfferSlice'
+import { Product } from '@/types/ProductType'
+
 export default function ProcessingPage() {
   const router = useRouter()
+  const dispatch = useAppDispatch()
+  const { success, error, loading } = useAppSelector(selectPurchase)
+
   const [counter, setCounter] = useState(3)
 
+  // Ambil data dari localStorage
   useEffect(() => {
-    if (counter === 0) {
-      router.push('/success') // Ganti ke halaman berikutnya
+    const stored = localStorage.getItem('selectedProduct')
+    if (stored) {
+      const product: Product = JSON.parse(stored)
+
+      const payload = {
+        id: product.id,
+        subscribe: product.subscribe ?? false,
+        version: product.version ?? 'v2',
+        campaignOffer: product.campaignOffer ?? false,
+        campaignId: product.campaignId ?? '',
+        campaignTrackingId: product.campaignTrackingId ?? '',
+      }
+
+      dispatch(purchaseOffer(payload))
+    } else {
+      alert('Tidak ada data produk yang dipilih.')
+      router.push('/')
+    }
+  }, [dispatch, router])
+
+
+  // Timer menuju halaman success
+  useEffect(() => {
+    if (counter === 0 && success) {
+      router.push('/success')
     }
 
     const timer = setInterval(() => {
@@ -18,13 +49,21 @@ export default function ProcessingPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [counter, router])
+  }, [counter, success, router])
+
+  // Jika gagal, tampilkan alert lalu redirect atau kembali
+  useEffect(() => {
+    if (error) {
+      alert('Gagal melakukan pembelian: ' + error)
+      router.push('/') // Atau ganti ke halaman error lain
+    }
+  }, [error, router])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center text-[#0F1B60]">
       {/* Logo Telkomsel */}
       <Image
-        src="/assets/logo/Telkomsel-Logo.png" // Pastikan kamu punya logo ini
+        src="/assets/logo/Telkomsel-Logo.png"
         alt="Telkomsel"
         width={120}
         height={40}
@@ -33,7 +72,7 @@ export default function ProcessingPage() {
 
       {/* Ilustrasi */}
       <Image
-        src="/assets/images/success_human.png" // Gambar karakter sesuai desain
+        src="/assets/images/success_human.png"
         alt="Processing"
         width={120}
         height={120}
@@ -54,8 +93,9 @@ export default function ProcessingPage() {
       <button
         onClick={() => router.push('/success')}
         className="bg-red-600 text-white px-8 py-3 rounded-full font-semibold text-sm mb-4"
+        disabled={loading}
       >
-        Lanjutkan
+        {loading ? 'Memproses...' : 'Lanjutkan'}
       </button>
 
       {/* Email info */}
