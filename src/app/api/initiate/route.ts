@@ -6,6 +6,7 @@ import axios from 'axios'
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
+const UPP_URL = process.env.UPP_URL!
 
 function buildHeaders(custParam: string) {
   const timestamp = Math.floor(Date.now() / 1000).toString()
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     // Step 2: Call /auth/redirect dan ambil location dari response header
     const redirectRes = await axios.post(
-      'https://api-mock.nuncorp.id/api/v1/auth/redirect',
+      `${UPP_URL}/api/auth/redirect`,
       { token },
       { maxRedirects: 0, validateStatus: (status) => status >= 200 && status < 400 } // cegah follow redirect
     )
