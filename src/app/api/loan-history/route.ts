@@ -20,8 +20,8 @@ function buildHeaders(custParam: string) {
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
-    'X-Signature': signature,
-    'x-cust-param': custParam,
+    'X-SIGNATURE': signature,
+    'X-CUST-PARAM': custParam,
     'Content-Type': 'application/json',
   }
 }

@@ -19,8 +19,8 @@ function buildHeaders(custParam: string) {
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
-    'X-Signature': signature,
-    'x-cust-param': custParam,
+    'X-SIGNATURE': signature,
+    'X-CUST-PARAM': custParam,
     'Content-Type': 'application/json',
   }
 }
@@ -39,6 +39,9 @@ export async function GET(req: NextRequest) {
   }
 
   const headers = buildHeaders(custParam)
+
+  console.log('[HEADER] headers:', headers)
+
   const url = `${BASE_URL}/api/v1/offers/balance`
 
   console.log('[STEP] Fetching from:', url)
