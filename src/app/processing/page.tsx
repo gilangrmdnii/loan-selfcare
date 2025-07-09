@@ -55,7 +55,7 @@ export default function ProcessingPage() {
   useEffect(() => {
     if (error) {
       alert('Gagal melakukan pembelian: ' + error)
-      router.push('/') // Atau ganti ke halaman error lain
+      router.push('/failed') // ⬅️ redirect ke halaman gagal
     }
   }, [error, router])
 

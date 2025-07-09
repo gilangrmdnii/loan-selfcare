@@ -12,9 +12,6 @@ export default function EmergencyBalance() {
 
     const { balances, loading, error } = useAppSelector((state) => state.emergencyBalance)
 
-    const [phone] = useState('081234567890')
-    const [currentBalance] = useState('Rp10.000')
-    const [expiredDate] = useState('3 Jun 2025')
 
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isModalOpen, setModalOpen] = useState(false)
@@ -48,17 +45,7 @@ export default function EmergencyBalance() {
                 </div>
             </div>
 
-            {/* Info Saldo Aktif */}
-            <div className="bg-gray-100 rounded-xl p-4">
-                <p className="text-sm text-gray-500">Prabayar {phone}</p>
-                <div className="flex justify-between items-center">
-                    <p className="font-bold">Saldo Darurat</p>
-                    <p className="text-red-600 font-bold">{currentBalance}</p>
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                    Sebagian saldo akan kadaluarsa pada {expiredDate}
-                </p>
-            </div>
+          
 
             {/* Divider */}
             <div className="flex items-center gap-4">

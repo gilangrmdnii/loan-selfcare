@@ -47,12 +47,12 @@ export default function SuccessPage() {
         </div>
         <div className="border-b pb-2">
           <p className="text-gray-500">Saldo Darurat 25rb</p>
-          <p className="text-sm font-semibold">Rp27.000</p>
+          <p className="text-sm font-semibold">Rp0</p>
           <p className="text-xs text-gray-400">081234567890</p>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-500">Subtotal</span>
-          <span className="font-semibold">Rp27.000</span>
+          <span className="font-semibold">Rp0</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-500">Biaya Layanan</span>
@@ -69,7 +69,7 @@ export default function SuccessPage() {
         <hr className="my-2" />
         <div className="flex justify-between font-bold text-[#0F1B60]">
           <span>Total Pembayaran</span>
-          <span>Rp27.000</span>
+          <span>Rp0</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-500">Metode Pembayaran</span>
