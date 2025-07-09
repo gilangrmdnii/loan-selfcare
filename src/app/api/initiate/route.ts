@@ -1,8 +1,8 @@
 // /app/api/initiate/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
 import axios from 'axios'
 import moment from "moment"
+import CryptoJS from "crypto-js"
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
@@ -10,11 +10,10 @@ const BASE_URL = process.env.BASE_URL!
 const UPP_URL = process.env.UPP_URL!
 
 function buildHeaders(custParam: string) {
-  const CryptoJS = require("crypto-js");
-  var timestamp = moment().unix().toString();
-  var plainText = API_KEY + SECRET_KEY + timestamp;
-  var sha256Hash = CryptoJS.SHA256(plainText);
-  var base64 = CryptoJS.enc.Base64.stringify(sha256Hash);
+  const timestamp = moment().unix().toString();
+  const plainText = API_KEY + SECRET_KEY + timestamp;
+  const sha256Hash = CryptoJS.SHA256(plainText);
+  const base64 = CryptoJS.enc.Base64.stringify(sha256Hash);
 
   return {
     'X-API-KEY': API_KEY,
