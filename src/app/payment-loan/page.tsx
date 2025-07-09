@@ -33,7 +33,7 @@ export default function PaymentMethodPage() {
 
     const paymentMethods: Method[] = [
         {
-            name: 'Pinjama Paket ( tanpa biaya )',
+            name: 'Pinjaman Paket ( tanpa biaya )',
             description: 'Saat isi ulang, pulsa kamu akan dipotong otomatis sesuai harga. S&K berlaku',
             icon: '/assets/payment/telkomsel.png'
         },

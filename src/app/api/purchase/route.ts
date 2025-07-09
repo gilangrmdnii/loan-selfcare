@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import axios from 'axios'
+import moment from "moment"
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
 
 function buildHeaders(custParam: string) {
-  const timestamp = Math.floor(Date.now() / 1000).toString()
-  const raw = API_KEY + timestamp
-  const signature = crypto.createHmac('sha256', SECRET_KEY).update(raw).digest('hex')
+  const CryptoJS = require("crypto-js");
+  var timestamp = moment().unix().toString();
+  var plainText = API_KEY + SECRET_KEY + timestamp;
+  var sha256Hash = CryptoJS.SHA256(plainText);
+  var base64 = CryptoJS.enc.Base64.stringify(sha256Hash);
 
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
-    'X-SIGNATURE': signature,
+    'X-SIGNATURE': base64,
     'X-CUST-PARAM': custParam,
     'Content-Type': 'application/json',
   }
