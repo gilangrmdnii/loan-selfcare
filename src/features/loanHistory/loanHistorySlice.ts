@@ -8,7 +8,7 @@ export interface LoanRecord {
   initial_date: string
   channel_transaction_id: string
   channelId: string | null
-  status: 'PAID' | 'UNPAID'
+  status: string
   channelName: string | null
   productName: string | null
 }
@@ -62,8 +62,8 @@ export const fetchLoanHistory = createAsyncThunk(
         createdAt: string
         transactionId: string
         channelId: string | null
-        status: 'PAID' | 'UNPAID'
-
+        status: string
+        channelName: string
       }
 
       interface PaymentApiItem {
@@ -72,31 +72,31 @@ export const fetchLoanHistory = createAsyncThunk(
         createdAt: string
         productName: string | null
         channelId: string | null
+        channelName: string
       }
 
       return {
-        paid: (data.data.loans ?? [])
-          .filter((item: LoanApiItem) => item.status === 'PAID')
-          .map((item: LoanApiItem) => ({
+        paid: (data.data.loans ?? []).map((item: LoanApiItem) => ({
             offerDescription: item.productName ?? null,
             offerCommercialName: item.productName ?? null,
             value: item.value,
             initial_date: item.createdAt,
             channel_transaction_id: item.transactionId,
             channelId: item.channelId ?? null,
-            status: 'PAID',
-
+            status: item.channelId ?? null,
+            productName: item.productName ?? null,
+            channelName: item.channelName ?? null,
           })),
-        unpaid: (data.data.loans ?? [])
-          .filter((item: LoanApiItem) => item.status === 'UNPAID')
-          .map((item: LoanApiItem) => ({
+        unpaid: (data.data.loans ?? []).map((item: LoanApiItem) => ({
             offerDescription: item.productName ?? null,
             offerCommercialName: item.productName ?? null,
             value: item.value,
             initial_date: item.createdAt,
             channel_transaction_id: item.transactionId,
             channelId: item.channelId ?? null,
-            status: 'UNPAID',
+            status: item.channelId ?? null,
+            productName: item.productName ?? null,
+            channelName: item.channelName ?? null,
           })),
         payment: (data.data.payments ?? []).map((item: PaymentApiItem) => ({
           transaction_id: item.transactionId,
@@ -104,6 +104,7 @@ export const fetchLoanHistory = createAsyncThunk(
           date: item.createdAt,
           productName: item.productName ?? null,
           channelId: item.channelId ?? null,
+          channelName: item.channelName ?? null,
         })),
         outstanding: data.data.outstanding ?? null,
       }

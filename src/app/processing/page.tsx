@@ -19,18 +19,7 @@ export default function ProcessingPage() {
   useEffect(() => {
     const stored = localStorage.getItem('selectedProduct')
     if (stored) {
-      const product: Product = JSON.parse(stored)
-
-      const payload = {
-        id: product.id,
-        subscribe: product.subscribe ?? false,
-        version: product.version ?? 'v2',
-        campaignOffer: product.campaignOffer ?? false,
-        campaignId: product.campaignId ?? '',
-        campaignTrackingId: product.campaignTrackingId ?? '',
-      }
-
-      dispatch(purchaseOffer(payload))
+    
     } else {
       alert('Tidak ada data produk yang dipilih.')
       router.push('/')
@@ -99,10 +88,10 @@ export default function ProcessingPage() {
       </button>
 
       {/* Email info */}
-      <p className="text-xs text-gray-500">
+      {/* <p className="text-xs text-gray-500">
         Faktur akan dikirim ke email <br />
         <span className="font-medium text-[#0F1B60]">johnsmith@gmail.com</span>
-      </p>
+      </p> */}
     </div>
   )
 }

@@ -30,6 +30,9 @@ type OfferItem = {
   price: string
   quota?: string
   validity?: string
+  campaignOffer: string
+  campaignId: string
+  campaignOfferTrackingId: string
 }
 
 type OffersResponse = {
@@ -65,6 +68,9 @@ export async function GET(req: NextRequest) {
       price: parseInt(item.price ?? '0'),
       promoPrice: null,
       duration: item.validity ?? '-',
+      campaignOffer: item.campaignOffer,
+      campaignId: item.campaignId,
+      campaignOfferTrackingId: item.campaignOfferTrackingId
     }))
 
     return NextResponse.json({ offers: mappedOffers })

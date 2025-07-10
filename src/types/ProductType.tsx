@@ -10,7 +10,7 @@ export interface Product {
   version?: string
   campaignOffer?: boolean
   campaignId?: string
-  campaignTrackingId?: string
+  campaignOfferTrackingId?: string
 }
 export interface ProductWithTerms extends Product {
   terms: string

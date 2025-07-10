@@ -105,11 +105,11 @@ export default function LoanHistoryClient() {
                       <p className={`${statusInfo.color} font-semibold`}>{statusInfo.label}</p>
                     </div>
 
-                    {item.status === 'UNPAID' && (
+                    {/* {item.status === 'UNPAID' && (
                       <div className="mt-2 flex justify-center">
                         <button className="text-xs text-blue-600 font-bold">Bayar Sekarang</button>
                       </div>
-                    )}
+                    )} */}
                   </li>
                 )
               })}
@@ -122,7 +122,7 @@ export default function LoanHistoryClient() {
             {payment.map((item, i) => (
               <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
                 <p className="text-sm font-semibold">
-                  Pembayaran {item.productName ? item.productName : '-'}
+                   {item.productName ? item.productName : '-'}
                 </p>
 
                 <div className="mt-2 flex justify-between text-xs text-gray-500">

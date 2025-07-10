@@ -55,14 +55,12 @@ export default function BillCard() {
           )} */}
         </div>
       </div>
-      <p className="mt-2 text-sm flex items-center gap-1">
-        <span className="text-red-500">⚠</span>
-        <p className="text-gray-500">
-          {offerCommercialName
-            ? `Produk: ${offerCommercialName}`
-            : 'Tagihan darurat tersedia'}
-        </p>
+     <div className="mt-2 text-sm flex items-center gap-1">
+      <span className="text-red-500">⚠</span>
+      <p className="text-gray-500">
+        Topup pulsa untuk melunasi tagihan
       </p>
     </div>
-  )
+    </div>
+  ) 
 }

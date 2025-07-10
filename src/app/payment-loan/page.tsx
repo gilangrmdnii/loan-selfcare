@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import PaymentHeader from '@/components/PaymentHeader'
 import { Product } from '@/types/ProductType'
+import { purchaseOffer, selectPurchase } from '@/features/purchaseOffer/purchaseOfferSlice'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 
 interface Method {
     name: string
@@ -13,10 +15,12 @@ interface Method {
 }
 
 export default function PaymentMethodPage() {
+    const dispatch = useAppDispatch()
     const router = useRouter()
     const [selected, setSelected] = useState<string | null>(null)
     const [timeLeft, setTimeLeft] = useState(5 * 60)
     const [product, setProduct] = useState<Product | null>(null)
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         const stored = localStorage.getItem('selectedProduct')
@@ -48,10 +52,38 @@ export default function PaymentMethodPage() {
     const m = String(Math.floor(timeLeft / 60)).padStart(2, '0')
     const s = String(timeLeft % 60).padStart(2, '0')
 
-    const handlePay = () => {
+   const handlePay = async () => {
         if (!selected) return
-        router.push(`/processing?method=${selected}`)
+
+        const stored = localStorage.getItem('selectedProduct')
+        if (!stored) {
+            alert('Tidak ada data produk yang dipilih.')
+            router.push('/')
+            return
+        }
+
+        const product: Product = JSON.parse(stored)
+
+        const payload = {
+            id: product.id,
+            subscribe: product.subscribe ?? false,
+            version: product.version ?? 'v2',
+            campaignOffer: product.campaignOffer ?? false,
+            campaignId: product.campaignId ?? '',
+            campaignTrackingId: product.campaignOfferTrackingId ?? '',
+        }
+
+        try {
+            setLoading(true)
+            await dispatch(purchaseOffer(payload)).unwrap()
+            router.push(`/processing?method=${selected}`)
+        } catch (error) {
+            alert(`Pembelian gagal: ${error}`)
+        } finally {
+            setLoading(false)
+        }
     }
+
 
     return (
         <>
@@ -133,14 +165,14 @@ export default function PaymentMethodPage() {
 
                 {/* Tombol Bayar */}
                 <button
-                    disabled={!selected}
+                    disabled={!selected || loading}
                     onClick={handlePay}
                     className={`mt-6 w-full rounded-full py-3 text-sm font-bold transition ${selected
                             ? 'bg-[#EF3026] text-white hover:bg-[#d9271d]'
                             : 'bg-[#D3D8E1] text-gray-500 cursor-not-allowed'
                         }`}
                 >
-                    Bayar
+                   {loading ? 'Loading...' : 'Bayar'}
                 </button>
             </div>
         </>
