@@ -61,6 +61,10 @@ export default function ConfirmModal({
         }
     }
 
+    const handleTopup = () => {
+        window.location.href = process.env.NEXT_PUBLIC_TOPUP_URL ?? "";
+    };
+
     return (
         <div
             className="fixed inset-0 z-50 bg-black/50 flex justify-center items-end md:items-center px-4"
@@ -102,6 +106,14 @@ export default function ConfirmModal({
                 </div>
 
                 {/* Buttons */}
+                <div className="space-y-3 pb-3">
+                    <button
+                        onClick={handleTopup}
+                        className="w-full border bg-red-500 text-white font-semibold py-3 rounded-full"
+                    >
+                        {'Top up Pulsa'}
+                    </button>
+                </div>
                 <div className="space-y-3">
                     <button
                         disabled={loading}

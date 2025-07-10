@@ -12,7 +12,7 @@ export default function BillCard() {
     unpaid,
   } = useAppSelector((state) => state.loanHistory)
 
-  const cipherPassword = "pLo4q4c09lidbpd6yxg50gf0uz1ppx9a"
+  const cipherPassword = process.env.NEXT_PUBLIC_CHIPER ?? "";
   const custParam = Cookies.get('custParam') ?? ''
   let msisdn = "-"
 
