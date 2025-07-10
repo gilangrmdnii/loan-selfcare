@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
 
   const url =
     `${BASE_URL}/api/v1/offers?` +
-    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${encodeURIComponent(FILTER_SALDO_DARURAT)}&mode=SELF&version=v4&category=PADAR`
+    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${encodeURIComponent(FILTER_SALDO_DARURAT)}&mode=SELF&version=v4&category=SADAR`
 
   console.log(url)
 
