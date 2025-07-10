@@ -7,6 +7,8 @@ import CryptoJS from "crypto-js"
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
+const CHANNEL_ID = process.env.CHANNEL_ID!
+const FILTER_PAKET_DARURAT = process.env.FILTER_PAKET_DARURAT!
 
 function buildHeaders(custParam: string) {
   const timestamp = moment().unix().toString();
@@ -51,7 +53,9 @@ export async function GET(req: NextRequest) {
   // Tanpa transactionId
   const url =
     `${BASE_URL}/api/v1/offers?` +
-    `type=PURCHASE&filteredBy=balance&mode=SELF&version=v4&paymentMethod=LOAN`
+    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${FILTER_PAKET_DARURAT}&mode=SELF&version=v4`
+
+  console.log(url)
 
   try {
     const headers = buildHeaders(custParam)

@@ -6,6 +6,8 @@ import CryptoJS from "crypto-js"
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
+const CHANNEL_ID = process.env.CHANNEL_ID!
+const FILTER_SALDO_DARURAT = process.env.FILTER_SALDO_DARURAT!
 
 function buildHeaders(custParam: string) {
   const timestamp = moment().unix().toString();
@@ -44,9 +46,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing x-cust-param' }, { status: 400 })
   }
 
-  const transactionId = '12345667890'
+  const url =
+    `${BASE_URL}/api/v1/offers?` +
+    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${FILTER_SALDO_DARURAT}&mode=SELF&version=v4`
 
-  const url = `${BASE_URL}/api/v1/offers?type=PURCHASE&transactionId=${transactionId}&filteredBy=balance&mode=SELF&version=v4&paymentMethod=BALANCE`
+  console.log(url)
 
   try {
     const headers = buildHeaders(custParam)

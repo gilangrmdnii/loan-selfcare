@@ -6,6 +6,7 @@ import CryptoJS from "crypto-js"
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
+const CHANNEL_ID = process.env.CHANNEL_ID!
 
 function buildHeaders(custParam: string) {
   const timestamp = moment().unix().toString();
@@ -40,16 +41,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const isSubscribed = subscribe === 'true' || subscribe === true
+    const iscampaignOfferd = campaignOffer === 'true' || campaignOffer === true
+
     const headers = buildHeaders(custParam)
 
     const payload = {
+      channelId: CHANNEL_ID,
       id,
-      subscribe: subscribe ?? false,
+      subscribe: isSubscribed ?? false,
       version,
-      campaignOffer: campaignOffer ?? false,
+      campaignOffer: iscampaignOfferd ?? false,
       campaignId: campaignId ?? '',
       campaignTrackingId: campaignTrackingId ?? '',
-      paymentMethod: 'LOAN',
     }
 
     const res = await axios.post(`${BASE_URL}/api/v1/offers/purchase`, payload, {
