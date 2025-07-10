@@ -3,12 +3,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from '@/store'
 
 interface InitiatePayload {
-  offerId: string
-  subscribe: boolean
-  version: string
-  campaignOffer: boolean
-  campaignId: string
-  campaignTrackingId: string
+  channel: string
+  amount: number
 }
 
 interface InitiateUppState {
