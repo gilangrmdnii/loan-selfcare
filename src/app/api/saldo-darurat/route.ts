@@ -31,6 +31,9 @@ type OfferItem = {
   price: string
   quota?: string
   validity?: string
+  campaignOffer: string
+  campaignId: string
+  campaignOfferTrackingId: string
 }
 
 type OffersResponse = {
@@ -48,7 +51,7 @@ export async function GET(req: NextRequest) {
 
   const url =
     `${BASE_URL}/api/v1/offers?` +
-    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${FILTER_SALDO_DARURAT}&mode=SELF&version=v4`
+    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${encodeURIComponent(FILTER_SALDO_DARURAT)}&mode=SELF&version=v4&category=PADAR`
 
   console.log(url)
 
@@ -66,7 +69,9 @@ export async function GET(req: NextRequest) {
       duration: item.validity ?? '-',
       price: parseInt(item.price ?? '0'),
       promoPrice: null,
-      terms: '', // tambahkan kalau ada data
+      campaignOffer: item.campaignOffer,
+      campaignId: item.campaignId,
+      campaignOfferTrackingId: item.campaignOfferTrackingId
     }))
 
     return NextResponse.json({ products })

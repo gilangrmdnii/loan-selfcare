@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
   // Tanpa transactionId
   const url =
     `${BASE_URL}/api/v1/offers?` +
-    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${FILTER_PAKET_DARURAT}&mode=SELF&version=v4`
+    `channelId=${CHANNEL_ID}&type=PURCHASE&filteredBy=${encodeURIComponent(FILTER_PAKET_DARURAT)}&mode=SELF&version=v4&category=PADAR`
 
   console.log(url)
 
