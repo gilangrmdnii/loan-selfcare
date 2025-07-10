@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function BillPaymentPage() {
   const router = useRouter()
@@ -13,6 +14,13 @@ export default function BillPaymentPage() {
     { nominal: 50000 },
     { nominal: 75000 },
   ]
+
+  const [msisdn, setMsisdn] = useState('')
+
+  useEffect(() => {
+    const stored = localStorage.getItem('msisdn') ?? ''
+    setMsisdn(stored)
+  }, [])
 
   return (
     <div className="min-h-screen bg-white px-4 pb-20 max-w-md mx-auto">
@@ -39,7 +47,7 @@ export default function BillPaymentPage() {
 
       {/* Tagihan Info */}
       <div className="bg-gray-50 rounded-xl p-4">
-        <p className="text-sm text-gray-500">Prabayar 081234567890</p>
+        <p className="text-sm text-gray-500">Prabayar {msisdn}</p>
         <div className="flex justify-between items-center mt-1">
           <h3 className="font-bold text-gray-800 text-base">Tagihan Anda</h3>
           <div className="text-right">

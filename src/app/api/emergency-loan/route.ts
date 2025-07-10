@@ -1,28 +1,25 @@
 // src/app/api/loan-history/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
+import CryptoJS from "crypto-js"
 import axios from 'axios'
+import moment from "moment"
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
 const BASE_URL = process.env.BASE_URL!
 
-
 function buildHeaders(custParam: string) {
-  const timestamp = Math.floor(Date.now() / 1000).toString()
-  const raw = API_KEY + timestamp
-  const signature = crypto
-    .createHmac('sha256', SECRET_KEY)
-    .update(raw)
-    .digest('hex')
-    
+  const timestamp = moment().unix().toString();
+  const plainText = API_KEY + SECRET_KEY + timestamp;
+  const sha256Hash = CryptoJS.SHA256(plainText);
+  const base64 = CryptoJS.enc.Base64.stringify(sha256Hash);
 
   return {
     'X-API-KEY': API_KEY,
     'X-TIMESTAMP': timestamp,
-    'X-Signature': signature,
-    'x-cust-param': custParam,
+    'X-SIGNATURE': base64,
+    'X-CUST-PARAM': custParam,
     'Content-Type': 'application/json',
   }
 }
