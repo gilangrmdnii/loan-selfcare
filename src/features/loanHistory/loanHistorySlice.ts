@@ -9,6 +9,8 @@ export interface LoanRecord {
   channel_transaction_id: string
   channelId: string | null
   status: 'PAID' | 'UNPAID'
+  channelName: string | null
+  productName: string | null
 }
 
 export interface PaymentRecord {
@@ -18,6 +20,7 @@ export interface PaymentRecord {
   date: string
   productName: string | null
   channelId: string | null
+  channelName: string | null
 }
 
 export interface LoanHistoryState {

@@ -14,9 +14,13 @@ export default function BillCard() {
 
   const cipherPassword = "pLo4q4c09lidbpd6yxg50gf0uz1ppx9a"
   const custParam = Cookies.get('custParam') ?? ''
-  const decryptedCustParam = decryptCustParam(cipherPassword, custParam)
-  const msisdn = decryptCustParam(cipherPassword, decryptedCustParam.split('|')[0])
-  localStorage.setItem("msisdn", msisdn);
+  let msisdn = "-"
+
+  if (custParam != '') {
+     const decryptedCustParam = decryptCustParam(cipherPassword, custParam)
+     msisdn = decryptCustParam(cipherPassword, decryptedCustParam.split('|')[0])
+     localStorage.setItem("msisdn", msisdn);
+  }
 
   const offerCommercialName = unpaid.length > 0 ? unpaid[0].offerCommercialName : null
   if (loading) {

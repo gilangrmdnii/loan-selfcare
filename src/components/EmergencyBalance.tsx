@@ -66,6 +66,13 @@ export default function EmergencyBalance() {
         }
     }
 
+    const [msisdn, setMsisdn] = useState('')
+
+    useEffect(() => {
+        const stored = localStorage.getItem('msisdn') ?? ''
+        setMsisdn(stored)
+    }, [])
+
     return (
         <div className="mt-6 space-y-6 text-[#0F1B60]">
             {/* Header Deskripsi */}
@@ -88,7 +95,7 @@ export default function EmergencyBalance() {
             {!emergencyLoan.loading && emergencyLoan.amount !== null && (
                 <div className="bg-gray-100 rounded-xl p-4">
                     <p className="text-sm text-gray-500">
-                        {emergencyLoan.msisdn ? `Prabayar ${emergencyLoan.msisdn}` : 'Nomor tidak tersedia'}
+                        {`Prabayar ${msisdn}`}
                     </p>
                     <div className="flex justify-between items-center">
                         <p className="font-bold">Saldo Darurat</p>

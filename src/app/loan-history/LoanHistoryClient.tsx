@@ -77,7 +77,7 @@ export default function LoanHistoryClient() {
                 return (
                   <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
                     <p className="text-sm font-semibold">
-                      {item.offerDescription || 'Pinjaman Darurat'}
+                      {item.productName || '-'}
                     </p>
 
                     <div className="mt-2 flex justify-between text-xs text-gray-500">
@@ -92,7 +92,7 @@ export default function LoanHistoryClient() {
 
                     <div className="mt-1 flex justify-between text-xs text-gray-500">
                       <p>Melalui</p>
-                      <p>{mapChannelId(item.channelId ?? null)}</p>
+                      <p>{item.channelName || '-'}</p>
                     </div>
 
                     <div className="mt-1 flex justify-between text-xs text-gray-500">
@@ -122,7 +122,7 @@ export default function LoanHistoryClient() {
             {payment.map((item, i) => (
               <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">
                 <p className="text-sm font-semibold">
-                  Pembayaran {item.productName ? item.productName : 'Paket Darurat'}
+                  Pembayaran {item.productName ? item.productName : '-'}
                 </p>
 
                 <div className="mt-2 flex justify-between text-xs text-gray-500">
@@ -132,7 +132,7 @@ export default function LoanHistoryClient() {
 
                 <div className="mt-1 flex justify-between text-xs text-gray-500">
                   <p>Melalui</p>
-                  <p>{mapChannelId(item.channelId)}</p>
+                  <p>{item.channelName || '-'}</p>
                 </div>
 
                 <div className="mt-1 flex justify-between text-xs text-gray-500">
