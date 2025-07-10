@@ -3,6 +3,8 @@
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useRouter } from 'next/navigation'
 import { initiateUpp } from '@/features/initiateUpp/initiateUppSlice'
+import { useEffect, useState } from 'react'
+import { fetchEmergencyLoan } from '@/features/emergencyLoan/emergencyLoanSlice'
 
 export default function ConfirmModal({
     isOpen,
@@ -13,8 +15,12 @@ export default function ConfirmModal({
 }) {
     const router = useRouter()
     const dispatch = useAppDispatch()
-    const { msisdn, amount } = useAppSelector((state) => state.emergencyLoan)
+    const { outstanding } = useAppSelector((state) => state.loanHistory)
 
+    useEffect(() => {
+        dispatch(fetchEmergencyLoan())
+    }, [dispatch])
+    
     if (!isOpen) return null
 
     const handleUpp = async () => {
@@ -22,12 +28,8 @@ export default function ConfirmModal({
 
         const resultAction = await dispatch(
             initiateUpp({
-                offerId: '00021523',
-                subscribe: false,
-                version: 'v2',
-                campaignOffer: false,
-                campaignId: 'CPGGL1234567890',
-                campaignTrackingId: 'CPGGL1234567890',
+                channel: 'i1',
+                amount: outstanding ?? 0,
             })
         )
 
@@ -60,7 +62,7 @@ export default function ConfirmModal({
                     <div className="flex justify-between items-center">
                         <h2 className="text-base font-bold text-[#0F1B60]">Tagihan Anda</h2>
                         <span className="text-red-600 font-bold text-lg">
-                            Rp{amount?.toLocaleString('id-ID') || '0'}
+                            Rp{outstanding?.toLocaleString('id-ID') || '0'}
                         </span>
                     </div>
                 </div>
