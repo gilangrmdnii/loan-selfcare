@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     if (axios.isAxiosError(error)) {
       console.error('Gagal initiate:', error.response?.data || error.message)
       return NextResponse.json(
-        { error: 'Gagal memulai proses UPP', detail: error.response?.data },
+        { error: 'Gagal memuat halaman', detail: error.response?.data },
         { status: 500 }
       )
     } else if (error instanceof Error) {

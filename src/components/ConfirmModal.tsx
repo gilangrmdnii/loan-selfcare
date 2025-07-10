@@ -16,28 +16,48 @@ export default function ConfirmModal({
     const router = useRouter()
     const dispatch = useAppDispatch()
     const { outstanding } = useAppSelector((state) => state.loanHistory)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         dispatch(fetchEmergencyLoan())
     }, [dispatch])
+
+    useEffect(() => {
+        if (!error) return
+
+        const timer = setTimeout(() => {
+            setError(null)
+        }, 10000)
+
+        return () => clearTimeout(timer)
+    }, [error])
     
     if (!isOpen) return null
 
     const handleUpp = async () => {
-        onClose()
+        setError(null)
+        setLoading(true)
 
-        const resultAction = await dispatch(
+        try {
+            const resultAction = await dispatch(
             initiateUpp({
                 channel: 'i1',
                 amount: outstanding ?? 0,
             })
-        )
+            )
 
-        if (initiateUpp.fulfilled.match(resultAction)) {
-            const { redirectUrl } = resultAction.payload as { redirectUrl: string }
-            router.push(redirectUrl) 
-        } else {
-            console.error('Gagal redirect: ', resultAction.payload)
+            if (initiateUpp.fulfilled.match(resultAction)) {
+                const { redirectUrl } = resultAction.payload as { redirectUrl: string }
+                router.push(redirectUrl)
+                onClose()
+            } else {
+                setError(resultAction.payload as string || 'Gagal memuat halaman')
+            }
+        }  catch (e) {
+            setError('Terjadi kesalahan saat memproses pembayaran.')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -45,16 +65,23 @@ export default function ConfirmModal({
         <div
             className="fixed inset-0 z-50 bg-black/50 flex justify-center items-end md:items-center px-4"
             onClick={(e) => {
-                if (e.target === e.currentTarget) onClose()
+                // if (e.target === e.currentTarget && !loading) onClose()
             }}
         >
             <div className="bg-white rounded-t-2xl w-full max-w-md p-6 shadow-lg">
+
                 {/* Close Button */}
                 <div className="flex justify-end mb-2">
                     <button onClick={onClose} className="text-[#0F1B60] text-xl font-bold">
                         ✕
                     </button>
                 </div>
+
+                {error && (
+                    <p className="mb-4 text-sm text-red-600 font-semibold pb-4">
+                        {error}
+                    </p>
+                )}
 
                 {/* Info Section */}
                 <div className="mb-4">
@@ -77,10 +104,11 @@ export default function ConfirmModal({
                 {/* Buttons */}
                 <div className="space-y-3">
                     <button
+                        disabled={loading}
                         onClick={handleUpp}
                         className="w-full border border-red-500 text-red-600 font-semibold py-3 rounded-full"
                     >
-                        Bayar Tagihan via E-Wallet
+                        {loading ? 'Loading...' : 'Bayar Tagihan via E-Wallet'}
                     </button>
                 </div>
             </div>

@@ -33,7 +33,7 @@ export const initiateUpp = createAsyncThunk(
 
       if (!res.ok) {
         const error = await res.json()
-        return rejectWithValue(error.message || 'Gagal memulai proses UPP')
+        return rejectWithValue(error.message)
       }
 
       return await res.json()
