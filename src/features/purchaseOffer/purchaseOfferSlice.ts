@@ -40,7 +40,10 @@ export const purchaseOffer = createAsyncThunk(
                 return rejectWithValue(error.message || 'Gagal melakukan pembelian')
             }
 
-            return await res.json()
+            const data = await res.json()
+            localStorage.setItem("orderId", data.data.data.orderId);
+
+            return data
         } catch (err: unknown) {
             let message = 'Terjadi kesalahan'
             if (err instanceof Error) {

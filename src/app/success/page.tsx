@@ -9,6 +9,7 @@ export default function SuccessPage() {
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [msisdn, setMsisdn] = useState('')
+  const [orderId, setOrderId] = useState('')
 
    useEffect(() => {
           const stored = localStorage.getItem('selectedProduct')
@@ -25,6 +26,11 @@ export default function SuccessPage() {
           const storedMsisdn = localStorage.getItem('msisdn') ?? ''
           setMsisdn(storedMsisdn)
      }, [])
+
+   useEffect(() => { 
+          const storedOrderId = localStorage.getItem('orderId') ?? ''
+          setOrderId(storedOrderId)
+   }, [])
 
   function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0');
@@ -68,7 +74,7 @@ export default function SuccessPage() {
       <div className="w-full text-left text-sm mt-6 space-y-3 max-w-md">
         <div className="flex justify-between border-b pb-1">
           <span className="text-gray-500">Order ID</span>
-          <span className="font-semibold">{ product?.id ?? "-" }</span>
+          <span className="font-semibold">{ orderId ?? "-" }</span>
         </div>
         <div className="flex justify-between border-b pb-1">
           <span className="text-gray-500">Tanggal Order</span>

@@ -24,8 +24,7 @@ export interface PaymentRecord {
 }
 
 export interface LoanHistoryState {
-  paid: LoanRecord[]
-  unpaid: LoanRecord[]
+  loans: LoanRecord[]
   payment: PaymentRecord[]
   outstanding: number | null
   loading: boolean
@@ -33,8 +32,7 @@ export interface LoanHistoryState {
 }
 
 const initialState: LoanHistoryState = {
-  paid: [],
-  unpaid: [],
+  loans: [],
   outstanding: null,
   payment: [],
   loading: false,
@@ -76,25 +74,14 @@ export const fetchLoanHistory = createAsyncThunk(
       }
 
       return {
-        paid: (data.data.loans ?? []).map((item: LoanApiItem) => ({
+        loans: (data.data.loans ?? []).map((item: LoanApiItem) => ({
             offerDescription: item.productName ?? null,
             offerCommercialName: item.productName ?? null,
             value: item.value,
             initial_date: item.createdAt,
             channel_transaction_id: item.transactionId,
             channelId: item.channelId ?? null,
-            status: item.channelId ?? null,
-            productName: item.productName ?? null,
-            channelName: item.channelName ?? null,
-          })),
-        unpaid: (data.data.loans ?? []).map((item: LoanApiItem) => ({
-            offerDescription: item.productName ?? null,
-            offerCommercialName: item.productName ?? null,
-            value: item.value,
-            initial_date: item.createdAt,
-            channel_transaction_id: item.transactionId,
-            channelId: item.channelId ?? null,
-            status: item.channelId ?? null,
+            status: item.status ?? null,
             productName: item.productName ?? null,
             channelName: item.channelName ?? null,
           })),
@@ -126,8 +113,7 @@ const loanHistorySlice = createSlice({
       })
       .addCase(fetchLoanHistory.fulfilled, (state, action) => {
         state.loading = false
-        state.paid = action.payload.paid
-        state.unpaid = action.payload.unpaid
+        state.loans = action.payload.loans
         state.payment = action.payload.payment
         state.outstanding = action.payload.outstanding
       })

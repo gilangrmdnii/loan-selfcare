@@ -14,13 +14,7 @@ export default function LoanHistoryClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
-  const { paid, unpaid, payment, loading } = useAppSelector((state) => state.loanHistory)
-
-  const combinedLoans = [...unpaid.map(item => ({ ...item, status: 'UNPAID' })), ...paid.map(item => ({ ...item, status: 'PAID' }))]
-
-  const sortedLoans = combinedLoans.sort(
-    (a, b) => new Date(b.initial_date).getTime() - new Date(a.initial_date).getTime()
-  )
+  const { loans, payment, loading } = useAppSelector((state) => state.loanHistory)
 
   function formatDateTime(dateStr: string): string {
     const date = new Date(dateStr)
@@ -40,9 +34,13 @@ export default function LoanHistoryClient() {
   }
 
   function getStatusLabel(status: string): { label: string; color: string } {
-    if (status === 'UNPAID') return { label: 'Belum Lunas', color: 'text-red-600' }
-    // Kamu bisa tambahkan logika Lunas Sebagian jika ada field pembanding
-    return { label: 'Lunas', color: 'text-green-600' }
+    if (status === 'UNPAID') {
+      return { label: 'Belum Lunas', color: 'text-red-600' };
+    }
+    if (status === 'PARTIAL') {
+      return { label: 'Lunas Sebagian', color: 'text-yellow-600' };
+    }
+    return { label: 'Lunas', color: 'text-green-600' };
   }
 
   useEffect(() => {
@@ -70,9 +68,9 @@ export default function LoanHistoryClient() {
         {loading ? (
           <p className="mt-6 text-center text-sm">Memuat data...</p>
         ) : activeTab === 'pinjaman' ? (
-          sortedLoans.length > 0 ? (
+          loans.length > 0 ? (
             <ul className="mt-4 space-y-3">
-              {sortedLoans.map((item, i) => {
+              {loans.map((item, i) => {
                 const statusInfo = getStatusLabel(item.status)
                 return (
                   <li key={i} className="rounded-xl bg-gray-50 px-4 py-3 shadow-sm text-[#0F1B60]">

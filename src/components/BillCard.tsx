@@ -9,7 +9,7 @@ export default function BillCard() {
     // msisdn,
     outstanding,
     loading,
-    unpaid,
+    // unpaid,
   } = useAppSelector((state) => state.loanHistory)
 
   const cipherPassword = process.env.NEXT_PUBLIC_CHIPER ?? "";
@@ -22,7 +22,7 @@ export default function BillCard() {
      localStorage.setItem("msisdn", msisdn);
   }
 
-  const offerCommercialName = unpaid.length > 0 ? unpaid[0].offerCommercialName : null
+  // const offerCommercialName = unpaid.length > 0 ? unpaid[0].offerCommercialName : null
   if (loading) {
     return <p className="text-sm text-gray-500 mt-4">Memuat tagihan...</p>
   }

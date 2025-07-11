@@ -68,9 +68,10 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                         <span>{showDescription ? '▲' : '▼'}</span>
                     </button>
                     {showDescription && (
-                        <p className="text-sm text-gray-700 mt-2">
-                            {product.description}
-                        </p>
+                       <p
+                        className="text-sm text-gray-700 mt-2"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                        />
                     )}
                 </div>
 
@@ -98,7 +99,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                 <div className="flex justify-between items-center px-6 py-4">
                     <span className="text-sm text-[#0F1B60] font-medium">Harga Total</span>
                     <span className="text-sm font-bold text-[#0F1B60]">
-                        {product.promoPrice ?? product.price}
+                        Rp{product.promoPrice?.toLocaleString('id-ID') ?? product.price?.toLocaleString('id-ID')}
                     </span>
                 </div>
 
