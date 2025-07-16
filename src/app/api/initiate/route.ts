@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     console.log("[SUCCESS] Redirect URL ditemukan:", location)
 
-    return NextResponse.json({ success: true, redirectUrl: location })
+    return NextResponse.json({ success: true, redirectUrl: location + "?token=" + token })
   } catch (error: unknown) {
     console.error("[EXCEPTION] Caught in try/catch")
 
