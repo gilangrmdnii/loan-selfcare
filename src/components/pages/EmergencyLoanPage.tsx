@@ -30,6 +30,7 @@ export default function EmergencyLoanPage() {
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
+  getTokenFromSearchOrCookie(raw)
 
   useEffect(() => {
     const token = getTokenFromSearchOrCookie(raw)
@@ -37,7 +38,6 @@ export default function EmergencyLoanPage() {
       dispatch(fetchLoanHistory(token))
     }
   }, [raw, dispatch])
-
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product)

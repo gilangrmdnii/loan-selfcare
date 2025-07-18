@@ -3,6 +3,7 @@ import { useAppSelector } from '@/store/hooks'
 import Link from 'next/link'
 import { decryptCustParam } from '@/utils/decryptCustParam'
 import Cookies from 'js-cookie'
+import { useEffect, useState } from 'react'
 
 export default function BillCard() {
   const {
@@ -13,14 +14,19 @@ export default function BillCard() {
   } = useAppSelector((state) => state.loanHistory)
 
   const cipherPassword = process.env.NEXT_PUBLIC_CHIPER ?? "";
-  const custParam = Cookies.get('custParam') ?? ''
-  let msisdn = "-"
+  const [msisdn, setMsisdn] = useState("-");
 
-  if (custParam != '') {
-     const decryptedCustParam = decryptCustParam(cipherPassword, custParam)
-     msisdn = decryptCustParam(cipherPassword, decryptedCustParam.split('|')[0])
-     localStorage.setItem("msisdn", msisdn);
-  }
+  useEffect(() => {
+    const custParam = Cookies.get('custParam') ?? '';
+    console.log(custParam)
+
+    if (custParam !== '') {
+      const decryptedCustParam = decryptCustParam(cipherPassword, custParam);
+      const msisdnDecrypted = decryptCustParam(cipherPassword, decryptedCustParam.split('|')[0]);
+      localStorage.setItem("msisdn", msisdnDecrypted);
+      setMsisdn(msisdnDecrypted);
+    }
+  }, [cipherPassword]);
 
   // const offerCommercialName = unpaid.length > 0 ? unpaid[0].offerCommercialName : null
   if (loading) {
