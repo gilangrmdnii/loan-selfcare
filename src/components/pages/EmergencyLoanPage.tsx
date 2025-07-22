@@ -13,6 +13,7 @@ import EmergencyInfo from '@/components/EmergencyInfo'
 import EmergencyPackages from '@/components/EmergencyPackages'
 import EmergencyBalance from '@/components/EmergencyBalance'
 import TermsModal from '@/components/TermsModal'
+import TermsEmergencyModal from '../TermsEmergencyModal'
 import ConfirmModal from '@/components/ConfirmModal'
 import ProductModal from '@/components/ProductModal'
 
@@ -26,6 +27,7 @@ export default function EmergencyLoanPage() {
   const raw = searchParams.get('custParam')
   // State untuk modal dan tab
   const [showTermsModal, setShowTermsModal] = useState(false)
+  const [showTermsEmergencyModal, setShowTermsEmergencyModal] = useState(false)
   const [activeTab, setActiveTab] = useState<'paket' | 'saldo'>('paket')
   const [isModalOpen, setModalOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -65,7 +67,10 @@ export default function EmergencyLoanPage() {
         {activeTab === 'paket' ? (
           <>
             <EmergencyVideo />
-            <EmergencyInfo onOpenTerms={() => setShowTermsModal(true)} />
+            <EmergencyInfo
+              onOpenTerms={() => setShowTermsModal(true)}
+              onOpenEmergencyTerms={() => setShowTermsEmergencyModal(true)}
+            />
             <EmergencyPackages onSelect={handleSelectProduct} />
           </>
         ) : (
@@ -92,6 +97,11 @@ export default function EmergencyLoanPage() {
         <TermsModal
           isOpen={showTermsModal}
           onClose={() => setShowTermsModal(false)}
+        />
+
+        <TermsEmergencyModal
+          isOpen={showTermsEmergencyModal}
+          onClose={() => setShowTermsEmergencyModal(false)}
         />
       </div>
     </div>

@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { fetchEmergencyBalance } from '@/features/emergencyBalance/emergencyBalanceSlice'
 import ProductModal from '@/components/ProductModal'
 import TermsModal from '@/components/TermsModal'
+import TermsEmergencyModal from './TermsEmergencyModal'
 import { Product } from '@/types/ProductType'
 import { fetchEmergencyLoan } from '@/features/emergencyLoan/emergencyLoanSlice'
 
@@ -37,6 +38,8 @@ export default function EmergencyBalance() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [isModalOpen, setModalOpen] = useState(false)
     const [showTermsModal, setShowTermsModal] = useState(false)
+    const [showTermsEmergencyModal, setShowTermsEmergencyModal] = useState(false)
+
 
     useEffect(() => {
         dispatch(fetchEmergencyBalance())
@@ -88,7 +91,13 @@ export default function EmergencyBalance() {
                     >
                         Syarat & Ketentuan
                     </button>
-                    <a href="#" className="text-blue-600 font-semibold underline">Cara Pembelian Dengan Saldo Darurat</a>
+
+                    <button
+                        onClick={() => setShowTermsEmergencyModal(true)}
+                        className="text-blue-600 font-semibold underline mr-4"
+                    >
+                        Cara Pembelian Dengan Saldo Darurat
+                    </button>
                 </div>
             </div>
 
@@ -162,6 +171,8 @@ export default function EmergencyBalance() {
 
             {/* Modal Syarat & Ketentuan */}
             <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
+
+            <TermsEmergencyModal isOpen={showTermsEmergencyModal} onClose={() => setShowTermsEmergencyModal(false)} />
         </div>
     )
 }

@@ -17,33 +17,35 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
     >
       <div className="bg-white rounded-t-2xl md:rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-semibold text-[#0F1B60]">Syarat dan Ketentuan</h2>
+          <div className="w-full">
+            <h2 className="text-base font-semibold text-[#0F1B60] text-center">
+              Syarat dan Ketentuan
+            </h2>
+          </div>
           <button onClick={onClose} className="text-[#0F1B60] text-xl font-bold">✕</button>
         </div>
+        <h2 className="text-sm mb-2">Berlaku untuk pelanggan Telkomsel PraBayar.</h2>
         <ol className="text-sm text-gray-700 list-decimal pl-5 space-y-2">
-          <li>
-            Saldo Darurat adalah saldo monetary voucher yang dapat digunakan untuk membeli layanan internet, telepon, dan SMS (dalam bentuk paket) serta membeli layanan digital seperti layanan video, musik, dan games. Saldo Darurat tidak bisa digunakan untuk layanan telepon, SMS, dan internet tanpa paket (PAYU/Pay as You Use).
+          <li className="mb-2">
+            Pelanggan telah aktif menggunakan kartu Telkomsel lebih dari 60 hari.
           </li>
-          <li>
-            Saldo Darurat dapat diaktifkan tanpa memotong pulsa di awal.
+          <li className="mb-2">
+            Pelanggan tidak sedang memiliki Paket Darurat yang belum dikembalikan.
           </li>
-          <li>
-            Harga yang tercantum sudah termasuk PPN.
+          <li className="mb-2">
+            Pelanggan wajib memenuhi kriteria frekuensi dan jumlah pengisian pulsa serta penggunaan rata-rata bulanan.
           </li>
-          <li>
-            Pembayaran dapat dilakukan nanti. Pulsa akan otomatis dipotong sesuai harga Saldo Darurat setelah:
-            <ul className="list-disc pl-6 mt-1 space-y-1">
-              <li>Melakukan pengisian pulsa.</li>
-              <li>Menerima transfer pulsa.</li>
-              <li>Masa aktif paket habis.</li>
-              <li>Melakukan pembayaran mandiri melalui UMB *505#.</li>
-            </ul>
+          <li className="mb-2">
+            Pelanggan yang melakukan isi ulang selain pulsa (misal paket data) maka tidak dapat dipotong untuk pembayaran Paket Darurat.
           </li>
-          <li>
-            Setelah diaktifkan, Anda akan mendapat Saldo Darurat senilai paket yang ditawarkan.
+          <li className="mb-2">
+            Layanan ini hanya dapat diaktifkan di Indonesia.
           </li>
-          <li>
-            Pembelian produk menggunakan Saldo Darurat tidak dikenakan biaya jika pelanggan memiliki nominal pulsa lebih atau sedang dalam masa tenggang.
+          <li className="mb-2">
+            Skema dan periode masa aktif berlangganan mengikuti masing-masing layanan yang dikonfirmasi pada awal pembelian.
+          </li>
+          <li className="mb-2">
+            Untuk keterangan lebih lanjut terkait layanan Paket Darurat Telkomsel, silakan menghubungi Customer Service 188.
           </li>
         </ol>
       </div>
