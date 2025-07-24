@@ -41,7 +41,7 @@ export const purchaseOffer = createAsyncThunk(
             }
 
             const data = await res.json()
-            localStorage.setItem("orderId", data.data.data.orderId);
+            localStorage.setItem("orderId", data.data.data.orderid);
 
             return data
         } catch (err: unknown) {

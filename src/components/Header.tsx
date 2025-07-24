@@ -25,14 +25,33 @@ export default function Header() {
 
   useEffect(() => {
     if (loans.length > 0) {
+      console.log(loans)
+
       const today = dayjs()
 
-      // Ambil transaksi dengan tanggal paling dekat ke hari ini
-      const closestLoan = loans.reduce((prev, curr) => {
-        const prevDiff = Math.abs(dayjs(prev.initial_date).diff(today))
-        const currDiff = Math.abs(dayjs(curr.initial_date).diff(today))
-        return currDiff < prevDiff ? curr : prev
-      })
+      const unpaidLoans = []
+      for (const loan of loans) {
+        if (loan.status !== 'PAID') {
+          unpaidLoans.push(loan)
+        }
+      }
+
+      if (unpaidLoans.length === 0) {
+        setBlockDate(null)
+        setIsBlocked(false)
+        return
+      }
+
+      let closestLoan = unpaidLoans[0]
+      let closestDiff = Math.abs(dayjs(closestLoan.initial_date).diff(today))
+
+      for (const loan of unpaidLoans) {
+        const diff = Math.abs(dayjs(loan.initial_date).diff(today))
+        if (diff < closestDiff) {
+          closestLoan = loan
+          closestDiff = diff
+        }
+      }
 
       const calculatedBlockDate = dayjs(closestLoan.initial_date)
       setBlockDate(calculatedBlockDate.format('YYYY-MM-DD'))
@@ -41,6 +60,7 @@ export default function Header() {
       setIsBlocked(isPast)
     }
   }, [loans])
+
 
   const handlePay = () => {
     window.location.href = "/payment"
