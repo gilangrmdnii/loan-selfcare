@@ -11,6 +11,7 @@ import { Product } from '@/types/ProductType'
 import ConfirmModal from '@/components/ConfirmModal'
 
 export default function LoanHistoryClient() {
+  const isPayment = process.env.NEXT_PUBLIC_PAYMENT
   const [activeTab, setActiveTab] = useState<'pinjaman' | 'pembayaran'>('pinjaman')
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -22,6 +23,9 @@ export default function LoanHistoryClient() {
   const showPayButton =
     (activeTab === 'pinjaman' && loans.length > 0) ||
     (activeTab === 'pembayaran')
+
+  console.log(showPayButton)
+  console.log(isPayment)
 
   const showChoosePackageButton = activeTab === 'pinjaman' && loans.length === 0
 
@@ -133,10 +137,10 @@ export default function LoanHistoryClient() {
 
                     {item.status === 'UNPAID' && (
                       <div className="mt-2 flex justify-center">
-                        <button 
+                        <button
                           onClick={() => router.back()}
                           className="text-xs text-blue-600 font-bold">
-                            Bayar Sekarang
+                          Bayar Sekarang
                         </button>
                       </div>
                     )}
@@ -177,7 +181,7 @@ export default function LoanHistoryClient() {
         )}
       </div>
 
-      {showPayButton && (
+      {showPayButton && isPayment === "true" && (
         <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-screen-sm px-4 pb-safe bg-white border-white border-t z-50">
           <button
             className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4 mb-4 text-[12px]"

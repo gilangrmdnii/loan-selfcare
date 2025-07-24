@@ -53,7 +53,7 @@ export default function BillCard() {
                   pathname: '/loan-history',
                 }}
               >
-                Riwayat Transaksi
+                Riwayat Tagihan
               </Link>
             </div>
           </div>

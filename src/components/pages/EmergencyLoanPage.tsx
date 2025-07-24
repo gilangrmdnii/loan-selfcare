@@ -23,6 +23,7 @@ import { fetchLoanHistory } from '@/features/loanHistory/loanHistorySlice'
 import { useAppSelector } from '@/store/hooks'
 
 export default function EmergencyLoanPage() {
+  const isPayment = process.env.NEXT_PUBLIC_PAYMENT
   const dispatch = useAppDispatch()
   const searchParams = useSearchParams()
   const raw = searchParams.get('custParam')
@@ -58,17 +59,17 @@ export default function EmergencyLoanPage() {
         <BillCard />
 
         {/* Tombol bayar tagihan */}
-        {outstanding !== null && outstanding > 0 ? 
+        {isPayment === "true" && outstanding !== null && outstanding > 0 && (
           <div>
             <button
-            onClick={() => setModalOpen(true)}
-            className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
-          >
-            Bayar Tagihan
-          </button>
-          </div> : 
-          <div></div>
-        }
+              onClick={() => setModalOpen(true)}
+              className="w-full bg-red-600 text-white py-3 rounded-full font-semibold mt-4"
+            >
+              Bayar Tagihan
+            </button>
+          </div>
+        )}
+
 
         {/* Tab navigasi */}
         <EmergencyTabs active={activeTab} onTabChange={setActiveTab} />

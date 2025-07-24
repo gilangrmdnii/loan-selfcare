@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function BillPaymentPage() {
+  const isPayment = process.env.NEXT_PUBLIC_PAYMENT
+
   const router = useRouter()
 
   const pulsaOptions = [
@@ -58,13 +60,15 @@ export default function BillPaymentPage() {
       </div>
 
       {/* Tombol Bayar */}
-      <button
-        onClick={() => router.push('/checkout')}
-        className="w-full bg-red-600 text-white font-semibold py-3 rounded-full mt-4"
-      >
-        Bayar Tagihan
-      </button>
-      
+      {isPayment === "true" && (
+        <button
+          onClick={() => router.push('/checkout')}
+          className="w-full bg-red-600 text-white font-semibold py-3 rounded-full mt-4"
+        >
+          Bayar Tagihan
+        </button> 
+      )}
+
       {/* Divider */}
       <div className="flex items-center my-6 gap-2 text-sm text-gray-500 font-medium">
         <div className="flex-1 h-px bg-gray-300" />
