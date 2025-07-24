@@ -3,17 +3,19 @@
 import SmartcardBlockNotice from "./SmartcardBlockNotice"
 import { fetchLoanHistory } from '@/features/loanHistory/loanHistorySlice'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { getTokenFromSearchOrCookie } from '@/utils/token'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 
 export default function Header() {
-  const { loans, payment, loading } = useAppSelector((state) => state.loanHistory)
+  const { loans } = useAppSelector((state) => state.loanHistory)
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
+
   const [blockDate, setBlockDate] = useState<string | null>(null)
   const [isBlocked, setIsBlocked] = useState(false)
+  const [showCountdown, setShowCountdown] = useState(false)
 
   useEffect(() => {
     const rawToken = searchParams.get('token')
@@ -24,43 +26,40 @@ export default function Header() {
   }, [dispatch, searchParams])
 
   useEffect(() => {
-    if (loans.length > 0) {
-      console.log(loans)
+    const unpaidLoans = loans.filter(loan => loan.status !== 'PAID')
 
-      const today = dayjs()
+    if (unpaidLoans.length === 0) {
+      setBlockDate(null)
+      setIsBlocked(false)
+      setShowCountdown(false)
+      return
+    }
 
-      const unpaidLoans = []
-      for (const loan of loans) {
-        if (loan.status !== 'PAID') {
-          unpaidLoans.push(loan)
-        }
-      }
+    const oldestLoan = unpaidLoans.reduce((prev, curr) => {
+      return dayjs(curr.initial_date).isBefore(dayjs(prev.initial_date)) ? curr : prev
+    })
 
-      if (unpaidLoans.length === 0) {
-        setBlockDate(null)
-        setIsBlocked(false)
-        return
-      }
+    console.log(oldestLoan);
 
-      let closestLoan = unpaidLoans[0]
-      let closestDiff = Math.abs(dayjs(closestLoan.initial_date).diff(today))
+    const loanDate = dayjs(oldestLoan.initial_date)
+    const blockThreshold = loanDate.add(90, 'day')
 
-      for (const loan of unpaidLoans) {
-        const diff = Math.abs(dayjs(loan.initial_date).diff(today))
-        if (diff < closestDiff) {
-          closestLoan = loan
-          closestDiff = diff
-        }
-      }
+    setBlockDate(blockThreshold.format('YYYY-MM-DD'))
 
-      const calculatedBlockDate = dayjs(closestLoan.initial_date)
-      setBlockDate(calculatedBlockDate.format('YYYY-MM-DD'))
+    const now = dayjs()
+    const daysUntilBlock = blockThreshold.diff(now, 'day')
 
-      const isPast = calculatedBlockDate.isBefore(today, 'day') || calculatedBlockDate.isSame(today, 'day')
-      setIsBlocked(isPast)
+    if (now.isAfter(blockThreshold) || now.isSame(blockThreshold, 'day')) {
+      setIsBlocked(true)
+      setShowCountdown(false)
+    } else if (daysUntilBlock <= 3) {
+      setIsBlocked(false)
+      setShowCountdown(true)
+    } else {
+      setIsBlocked(false)
+      setShowCountdown(false)
     }
   }, [loans])
-
 
   const handlePay = () => {
     window.location.href = "/payment"
@@ -74,7 +73,7 @@ export default function Header() {
         </div>
       </div>
 
-      {blockDate && (
+      {blockDate && (isBlocked || showCountdown) && (
         <SmartcardBlockNotice
           isBlocked={isBlocked}
           blockDate={blockDate}
