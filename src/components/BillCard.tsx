@@ -53,7 +53,7 @@ export default function BillCard() {
               // },
             }}
           >
-            Lihat Riwayat
+            Riwayat Transaksi
           </Link>
           {/* )} */}
           {/* {!msisdn && (

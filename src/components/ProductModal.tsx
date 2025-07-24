@@ -88,7 +88,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                     </button>
                     {showTerms && (
                         <p className="text-sm text-gray-700 mt-2">
-                            Silakan isi dengan teks syarat dan ketentuan di sini.
+                            {/* Silakan isi dengan teks syarat dan ketentuan di sini. */}
                         </p>
                     )}
                 </div>

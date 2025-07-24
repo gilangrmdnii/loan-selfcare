@@ -87,14 +87,14 @@ export default function EmergencyBalance() {
                 <div className="mt-2 text-sm">
                     <button
                         onClick={() => setShowTermsModal(true)}
-                        className="text-blue-600 font-semibold underline mr-4"
+                        className="text-blue-600 font-semibold mr-4"
                     >
                         Syarat & Ketentuan
                     </button>
 
                     <button
                         onClick={() => setShowTermsEmergencyModal(true)}
-                        className="text-blue-600 font-semibold underline mr-4"
+                        className="text-blue-600 font-semibold mr-4"
                     >
                         Cara Pembelian Dengan Saldo Darurat
                     </button>
@@ -113,10 +113,14 @@ export default function EmergencyBalance() {
                         </p>
                     </div>
                     {emergencyLoan.expiry && (
-                        <p className="text-sm text-gray-500 mt-1">
-                            Sebagian saldo akan kadaluarsa pada{' '}
-                            {formattedExpiry}
-                        </p>
+                        <div>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Sebagian saldo akan kadaluarsa pada{' '}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                {formattedExpiry}
+                            </p>
+                        </div>
                     )}
                 </div>
             )}
