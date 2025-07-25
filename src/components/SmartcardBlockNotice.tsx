@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from "react"
 import dayjs from "dayjs"
+import ConfirmModal from '@/components/ConfirmModal'
+import { Product } from '@/types/ProductType'
 
 type SmartcardProps = {
-  blockDate?: string 
+  blockDate?: string
   isBlocked: boolean
   onPay: () => void
 }
 
 export default function SmartcardBlockNotice({ blockDate, isBlocked, onPay }: SmartcardProps) {
   const [dismissed, setDismissed] = useState(false)
+  const [isModalOpen, setModalOpen] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     const today = new Date().toDateString()
@@ -46,13 +50,19 @@ export default function SmartcardBlockNotice({ blockDate, isBlocked, onPay }: Sm
         {message}
       </p>
       <div className="flex items-center gap-2 ml-4">
-        <button className="text-black font-bold">
+        <button onClick={() => setModalOpen(true)} className="text-black font-bold">
           BAYAR
         </button>
         <button onClick={handleDismiss} className="text-black font-bold text-lg leading-none">
           ×
         </button>
       </div>
+
+      {/* Modal konfirmasi */}
+      <ConfirmModal
+        isOpen={isModalOpen && selectedProduct === null}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   )
 }
