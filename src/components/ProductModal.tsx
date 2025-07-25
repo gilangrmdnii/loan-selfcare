@@ -110,6 +110,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                             if (product) {
                                 // Simpan ke localStorage
                                 localStorage.setItem('selectedProduct', JSON.stringify(product))
+                                localStorage.setItem("typePayment", "not-upp")
                             }
 
                             onClose()

@@ -38,6 +38,7 @@ export default function ConfirmModal({
     const handleUpp = async () => {
         setError(null)
         setLoading(true)
+        localStorage.setItem("typePayment", "upp")
 
         try {
             const resultAction = await dispatch(
@@ -62,6 +63,7 @@ export default function ConfirmModal({
     }
 
     const handleTopup = () => {
+        localStorage.setItem("typePayment", "upp")
         window.location.href = process.env.NEXT_PUBLIC_TOPUP_URL ?? "";
     };
 
