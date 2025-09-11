@@ -41,6 +41,8 @@ export async function GET(req: NextRequest) {
   try {
     const headers = buildHeaders(custParam)
 
+    console.log('[HEADER] Fetching loan profile from:', headers);
+
     const url = `${BASE_URL}/api/v1/loena/profile`
     console.log('[STEP] Fetching loan profile from:', url)
 
