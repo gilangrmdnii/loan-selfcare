@@ -41,7 +41,16 @@ export async function POST(req: NextRequest) {
 
     console.log("[STEP] Calling /upp/initiate")
     // Step 1: Call /upp/initiate
-    const uppRes = await axios.post(`${BASE_URL}/api/v1/upp/initiate`, body, { headers })
+    const uppRes = await axios.post(
+      `${BASE_URL}/api/v1/upp/initiate`,
+      body,
+      {
+        headers,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
+      }
+    );
     console.debug("[STEP] /upp/initiate Response:", uppRes.data)
 
     const token = uppRes.data?.data

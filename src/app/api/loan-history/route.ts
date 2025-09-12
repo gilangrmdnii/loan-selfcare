@@ -46,7 +46,12 @@ export async function GET(req: NextRequest) {
     const url = `${BASE_URL}/api/v1/loena/profile`
     console.log('[STEP] Fetching loan profile from:', url)
 
-    const response = await axios.get(url, { headers })
+    const response = await axios.get(url, {
+      headers,
+      httpsAgent: new (require('https').Agent)({
+        rejectUnauthorized: false,
+      }),
+    });
 
     console.log('[STEP] Response status:', response.status)
     return NextResponse.json(response.data)

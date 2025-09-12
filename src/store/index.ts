@@ -7,8 +7,8 @@ import emergencyPackagesReducer from '@/features/emergencyPackages/emergencyPack
 import emergencyBalanceReducer from '@/features/emergencyBalance/emergencyBalanceSlice'
 import purchaseReducer from '@/features/purchaseOffer/purchaseOfferSlice'
 import initiateUppReducer from '@/features/initiateUpp/initiateUppSlice'
-
-
+import bookingValidateReducer from '@/features/bookingValidate/bookingValidateSlice'
+import bookingConsentReducer from '@/features/bookingConsent/bookingConsentSlice'
 
 export const makeStore = () =>
   configureStore({
@@ -19,7 +19,8 @@ export const makeStore = () =>
       emergencyBalance: emergencyBalanceReducer,
       purchase: purchaseReducer,
       initiateUpp: initiateUppReducer,
-
+      bookingValidate: bookingValidateReducer,
+      bookingConsent: bookingConsentReducer
     },
   })
 

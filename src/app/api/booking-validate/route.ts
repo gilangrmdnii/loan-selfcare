@@ -1,10 +1,7 @@
-// src/app/api/loan-history/route.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 import CryptoJS from "crypto-js"
 import axios from 'axios'
 import moment from "moment"
-import https from 'https';
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
@@ -26,22 +23,16 @@ function buildHeaders(custParam: string) {
 }
 
 export async function GET(req: NextRequest) {
-  const custParam = req.headers.get('x-cust-param') || req.cookies.get('custParam')?.value
+  const { searchParams } = new URL(req.url);
+  const code = searchParams.get('code');
 
-  console.log('[API] GET /api/loan-history')
-  console.log('[HEADER] x-cust-param:', custParam)
-
-  if (!custParam) {
-    return NextResponse.json(
-      { error: 'Missing x-cust-param header' },
-      { status: 400 }
-    )
-  }
-
+  console.log(`[API] GET /api/v1/booking/validate/${code}`)
+  
   try {
-    const headers = buildHeaders(custParam)
+    const headers = buildHeaders("")
+    console.log('[HEADER] headers:', headers)
 
-    const url = `${BASE_URL}/api/v1/offers/balance`
+    const url = `${BASE_URL}/api/v1/booking/validate/${code}`
     console.log('[STEP] Fetching loan profile from:', url)
 
     const response = await axios.get(url, {
@@ -54,7 +45,7 @@ export async function GET(req: NextRequest) {
     console.log('[STEP] Response status:', response.status)
     return NextResponse.json(response.data)
   } catch (error: unknown) {
-    console.error('[ERROR] Failed to fetch loan history')
+    console.error('[ERROR] Failed to booking validate')
 
     if (axios.isAxiosError(error)) {
       console.error('[AxiosError]', error.response?.data || error.message)
@@ -64,6 +55,6 @@ export async function GET(req: NextRequest) {
       console.error('[Unknown Error]', error)
     }
 
-    return NextResponse.json({ error: 'Failed to fetch loan history' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to booking validate' }, { status: 500 })
   }
 }

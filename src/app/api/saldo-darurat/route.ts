@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import moment from "moment"
 import CryptoJS from "crypto-js"
+import https from 'https';
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
@@ -57,7 +58,14 @@ export async function GET(req: NextRequest) {
 
   try {
     const headers = buildHeaders(custParam)
-    const res = await axios.get<OffersResponse>(url, { headers })
+    const agent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
+    const res = await axios.get<OffersResponse>(url, {
+      headers,
+      httpsAgent: agent,
+    });
 
     const offers = res.data?.data?.offers ?? []
 

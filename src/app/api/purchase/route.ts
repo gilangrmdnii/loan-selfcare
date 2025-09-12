@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import moment from "moment"
 import CryptoJS from "crypto-js"
+import https from 'https';
 
 const API_KEY = process.env.API_KEY!
 const SECRET_KEY = process.env.SECRET_KEY!
@@ -56,10 +57,15 @@ export async function POST(req: NextRequest) {
       campaignTrackingId: campaignTrackingId ?? '',
     }
 
+    const agent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
     const res = await axios.post(`${BASE_URL}/api/v1/offers/purchase`, payload, {
       headers,
-    })
-
+      httpsAgent: agent,
+    });
+    
     return NextResponse.json({ success: true, data: res.data })
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {

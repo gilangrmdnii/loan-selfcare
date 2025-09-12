@@ -7,11 +7,13 @@ import { useSearchParams } from 'next/navigation'
 import { getTokenFromSearchOrCookie } from '@/utils/token'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const { loans } = useAppSelector((state) => state.loanHistory)
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
+  const pathname = usePathname();
 
   const [blockDate, setBlockDate] = useState<string | null>(null)
   const [isBlocked, setIsBlocked] = useState(false)
@@ -73,12 +75,14 @@ export default function Header() {
         </div>
       </div>
 
-      {blockDate && (isBlocked || showCountdown) && (
-        <SmartcardBlockNotice
-          isBlocked={isBlocked}
-          blockDate={blockDate}
-          onPay={handlePay}
-        />
+      {blockDate &&
+        (isBlocked || showCountdown) &&
+        !pathname.startsWith("/partnership") && (
+          <SmartcardBlockNotice
+            isBlocked={isBlocked}
+            blockDate={blockDate}
+            onPay={handlePay}
+          />
       )}
     </div>
   )
